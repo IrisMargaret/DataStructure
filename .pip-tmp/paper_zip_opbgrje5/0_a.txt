@@ -1,0 +1,4 @@
+A Survey of Vector Databases
+Li Si
+Abstract: We survey vector databases for similarity search and retrieval.
+2024

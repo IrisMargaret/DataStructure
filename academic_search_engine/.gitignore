@@ -1,0 +1,17 @@
+# Secrets (loaded via python-dotenv at startup)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Runtime artifacts
+uploads/
+logs/
+.pip-tmp/
+*.log
+.DS_Store
+
+# Stored paper files (runtime copies of uploaded originals)
+data/papers_files/

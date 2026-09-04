@@ -1,0 +1,5 @@
+2026-09-04 15:32:09,020 ERROR 捕获异常示例
+Traceback (most recent call last):
+  File "C:\DataStructure\academic_search_engine\smoke_test.py", line 524, in test_quality_fixes
+    raise ValueError("demo-error")
+ValueError: demo-error

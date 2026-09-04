@@ -1,0 +1,10 @@
+# 学术论文关键词索引与检索系统 —— 依赖清单
+# Python 3.9+
+flask>=3.0.0          # Web 框架
+flask-cors>=4.0.0     # 跨域支持
+python-dotenv>=1.0.0  # 读取 .env 配置（Agent 密钥等，仅此一处承载）
+jieba>=0.42.1         # 中文分词
+arxiv>=2.0.0          # arXiv 官方 Python 库（数据采集）
+PyPDF2>=3.0.0         # PDF 文本提取（备选）
+pypdf>=4.0.0          # PDF 文本提取（优先，CJK 支持更好）
+requests>=2.31.0      # HTTP（arXiv/OpenAlex 采集 + Agent 大模型调用）
