@@ -141,16 +141,22 @@ def main():
 
         def pick_upload(self, ai):
             if self._win is None:
-                return {"error": "窗口尚未就绪，请重试"}
-            files = self._win.create_file_dialog(
-                webview.OPEN_DIALOG,
-                allow_multiple=False,
-                file_types=("Documents (*.pdf;*.txt;*.md;*.zip)",),
-            )
+                return {"error": "窗口尚未就绪，请稍候重试"}
+            try:
+                files = self._win.create_file_dialog(
+                    webview.OPEN_DIALOG,
+                    allow_multiple=False,
+                    file_types=("Documents (*.pdf;*.txt;*.md;*.zip)",),
+                )
+            except Exception as exc:
+                return {"error": "打开文件对话框失败：%s" % exc}
             if not files:
                 return {"cancelled": True}
-            path = files[0]
-            return self._post(path, 1 if ai else 0)
+            return self._post(files[0], 1 if ai else 0)
+
+        def pickUpload(self, ai):
+            """与 JS 端命名对齐的入口（pywebview 按方法名原样暴露）。"""
+            return self.pick_upload(ai)
 
         def _post(self, path, ai):
             import os

@@ -7468,7 +7468,7 @@
       "types",
       "small",
       "representation",
-      "isonn"
+      "different"
     ],
     "file_name": null,
     "file_store": null,
@@ -10502,8 +10502,8 @@
     "keywords": [
       "life",
       "stacking",
-      "transformer",
       "prediction",
+      "transformer",
       "ensemble",
       "reliability",
       "genetic",
@@ -21437,8 +21437,8 @@
       "backbone",
       "pyramid",
       "vision",
-      "transformer",
       "prediction",
+      "transformer",
       "ap"
     ],
     "file_name": null,
@@ -21497,7 +21497,7 @@
       "transformer-based",
       "ltsf-linear",
       "temporal",
-      "transformers"
+      "solutions"
     ],
     "file_name": null,
     "file_store": null,
@@ -24669,7 +24669,7 @@
       "diffusion",
       "displacement",
       "squared",
-      "centenary"
+      "different"
     ],
     "file_name": null,
     "file_store": null,
@@ -32495,7 +32495,7 @@
   },
   {
     "id": 1126,
-    "source_id": null,
+    "source_id": "1126",
     "url": null,
     "title": "Attention-Free Transformer Analysis",
     "abstract": "We analyze attention-free transformer variants for sequence modelling with benchmarks.",

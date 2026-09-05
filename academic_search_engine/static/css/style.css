@@ -21,9 +21,10 @@
   --danger-soft: #f9e9e5;
   --topbar-h: 52px;
   --radius: 12px;
-  /* 系统栏安全间距：由 Android MainActivity 按 insets 注入；桌面/浏览器为 0 */
-  --sb-top: env(safe-area-inset-top, 0px);
-  --sb-bottom: env(safe-area-inset-bottom, 0px);
+  /* 系统栏安全间距：安卓端已由 MainActivity 的容器 insets 原生避让，此处恒为 0，
+     避免 WebView 同时支持 env() 时造成双重偏移；桌面/浏览器天然为 0 */
+  --sb-top: 0px;
+  --sb-bottom: 0px;
   --shadow: 0 1px 2px rgba(38, 35, 30, .05), 0 10px 28px rgba(38, 35, 30, .06);
   /* 全站衬线排版：中文宋体、西文 Times New Roman */
   --sans: "Times New Roman", Times, Georgia,
@@ -425,12 +426,18 @@ a.result-title:hover { color: var(--accent-deep); }
 .tabpane.active { display: block; }
 
 .file-drop {
+  position: relative;
   border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: 18px;
-  text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s;
+  text-align: center; color: var(--muted); cursor: pointer;
+  transition: border-color .15s, background .15s;
 }
 .file-drop:hover, .file-drop.has, .file-drop.drag { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep); }
-.file-drop .fname { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
-.file-drop input { display: none; }
+.file-drop .fname { display: block; font-size: 13px; font-weight: 600; color: var(--ink); pointer-events: none; }
+/* 透明 file input 覆盖整块区域：点击/拖放都由浏览器原生处理，兼容 Web/WebView */
+.file-drop input[type="file"] {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; font-size: 0;
+}
 
 .report { margin-top: 12px; font-size: 13px; }
 .report .ok { color: var(--sage); font-weight: 600; }
@@ -583,16 +590,25 @@ pre.fig {
 .math {
   font-family: var(--sans); font-style: italic; color: var(--ink);
   background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
-  padding: 14px 16px; margin-top: 10px; text-align: center;
+  padding: 14px 14px; margin-top: 10px; text-align: center;
 }
-.math .mline { font-size: 17px; line-height: 2.1; }
+.math .mline { font-size: 16px; line-height: 2.15; }
 .math .mline + .mline { margin-top: 6px; }
 .math .rm { font-style: normal; }
-.math sub, .math sup { font-size: 11px; font-style: normal; }
+.math sub, .math sup { font-size: 10.5px; font-style: normal; }
 .mfrac {
   display: inline-flex; flex-direction: column; vertical-align: middle;
-  text-align: center; margin: 0 3px; line-height: 1.15;
+  text-align: center; margin: 0 3px; line-height: 1.2;
 }
 .mfrac .top { border-bottom: 1px solid var(--ink); padding: 0 8px 1px; font-size: 13px; }
 .mfrac .bot { padding: 1px 8px 0; font-size: 13px; }
-.math .sum { font-size: 24px; vertical-align: -6px; padding: 0 2px; }
+.math .sum { font-size: 23px; vertical-align: -6px; padding: 0 2px; }
+@media (max-width: 400px) {
+  .math .mline { font-size: 14.5px; }
+  .math .mfrac .top, .math .mfrac .bot { font-size: 12px; }
+}
+@media (min-width: 900px) and (min-height: 520px) {
+  .math .mline { font-size: 19px; }
+  .math .mfrac .top, .math .mfrac .bot { font-size: 15px; }
+  .math .sum { font-size: 27px; }
+}

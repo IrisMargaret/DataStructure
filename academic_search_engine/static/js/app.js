@@ -520,32 +520,18 @@ function bindFilePick(inputId, labelId, btnId) {
     zone.classList.toggle("has", !!f);
     $(btnId).disabled = !f;
   };
+  // file input 已透明层化覆盖整块区域：点击与拖放均由浏览器原生处理
   input.addEventListener("change", sync);
-  // 点击整块区域弹出文件选择器（兼容 WebView/桌面窗口，避免双击弹两次）
-  zone.addEventListener("click", (e) => {
-    e.preventDefault();
-    input.click();
-  });
-  ["dragenter", "dragover"].forEach((ev) =>
-    zone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      zone.classList.add("drag");
+  // 拖拽悬停高亮（实际 drop 交给原生 file input）
+  zone.addEventListener("dragenter", (e) => { e.preventDefault(); zone.classList.add("drag"); });
+  zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("drag"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("drag"));
+  zone.addEventListener("drop", () => zone.classList.remove("drag"));
+  // 兜底：防止文件拖到页面其它区域时浏览器直接打开它
+  ["dragover", "drop"].forEach((ev) =>
+    window.addEventListener(ev, (e) => {
+      if (e.target && !e.target.closest(".file-drop")) e.preventDefault();
     }));
-  ["dragleave", "drop"].forEach((ev) =>
-    zone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      zone.classList.remove("drag");
-    }));
-  zone.addEventListener("drop", (e) => {
-    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if (!f) return;
-    try {
-      const dt = new DataTransfer();
-      dt.items.add(f);
-      input.files = dt.files;
-    } catch (_) { /* 老内核不支持拖拽赋值，请点选 */ }
-    sync();
-  });
   sync();
 }
 
@@ -570,8 +556,9 @@ function showMsg(html) {
 }
 
 function desktopBridge() {
-  return (window.pywebview && window.pywebview.api
-    && window.pywebview.api.pickUpload) ? window.pywebview.api : null;
+  const a = window.pywebview && window.pywebview.api;
+  if (!a) return null;
+  return a.pickUpload || a.pick_upload || null;
 }
 
 function finishSingle(d) {
@@ -980,79 +967,5 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshStats();
   parseHash();
   if (!location.hash) switchView("search");
-  // 演示入口：?modal=terms 自动打开「索引总项数构成」弹窗（便于无头截图预览）
-  if (new URLSearchParams(location.search).has("modal")) {
-    setTimeout(() => openTermsBrowser("postings"), 1000);
-  }
 });
 
-/* ---------- 无头布局探针（?probe=1 触发，仅开发校验用） ---------- */
-window.addEventListener("load", () => {
-  if (!new URLSearchParams(location.search).has("probe")) return;
-  setTimeout(() => {
-    const out = [];
-    const doc = document.documentElement;
-    out.push("VW=" + window.innerWidth + "x" + window.innerHeight);
-    out.push("doc scrollW=" + doc.scrollWidth + " clientW=" + doc.clientWidth + (doc.scrollWidth > doc.clientWidth + 1 ? " OVERFLOW" : ""));
-    const nav = document.querySelector(".nav");
-    if (nav) {
-      const cs = getComputedStyle(nav);
-      const rect = nav.getBoundingClientRect();
-      out.push("nav pos=" + cs.position + " flexDir=" + cs.flexDirection + " rect=" + Math.round(rect.left) + "," + Math.round(rect.top) + "," + Math.round(rect.width) + "x" + Math.round(rect.height));
-    }
-    ["search", "library", "structure", "settings"].forEach((v) => {
-      const el = document.getElementById("view-" + v);
-      if (!el) return;
-      const wasHidden = el.classList.contains("hidden");
-      if (wasHidden) el.classList.remove("hidden");
-      const sw = el.scrollWidth, cw = el.clientWidth;
-      out.push("view-" + v + " scrollW=" + sw + " clientW=" + cw + (sw > cw + 1 ? " OVERFLOW" : ""));
-      const offenders = [];
-      el.querySelectorAll("div,table,section,main,ul,ol,dl,details,pre").forEach((n) => {
-        if (n.scrollWidth > cw + 2) offenders.push((n.className && n.className.toString ? n.className.toString().slice(0, 34) : n.tagName) + ":" + n.tagName);
-      });
-      if (offenders.length) out.push("  offenders " + offenders.slice(0, 6).join(" | "));
-      if (wasHidden) el.classList.add("hidden");
-    });
-    const pre = document.createElement("pre");
-    pre.id = "probe-out";
-    pre.textContent = out.join("\n");
-    document.body.appendChild(pre);
-  }, 600);
-});
-
-/* ---------- 交互自测（?actions=1 触发，仅开发校验用） ---------- */
-window.addEventListener("load", () => {
-  if (!new URLSearchParams(location.search).has("actions")) return;
-  (async () => {
-    const out = [];
-    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-    try {
-      openTermsBrowser("unique");
-      await wait(1100);
-      const st = document.getElementById("terms-stat");
-      out.push("uniqueRows=" + document.querySelectorAll(".trow").length + " stat=" + (st ? st.textContent : "none"));
-      closeModal();
-      await wait(250);
-      openTermsBrowser("postings");
-      await wait(1100);
-      const st2 = document.getElementById("terms-stat");
-      const tl2 = document.getElementById("terms-total");
-      out.push("postingsStat=" + (st2 ? st2.textContent : "") + " total=" + (tl2 ? tl2.textContent : ""));
-      closeModal();
-      await wait(250);
-      document.getElementById("q").value = "attention";
-      await doSearch();
-      await wait(1600);
-      out.push("results=" + document.querySelectorAll("#results-list .result").length);
-      const mm = document.getElementById("results-meta");
-      out.push("meta=" + (mm ? mm.textContent.slice(0, 150) : ""));
-      const settings = await api("/api/settings");
-      out.push("settingsGet=" + (settings.configured ? "on" : "off"));
-    } catch (e) { out.push("PROBE2 ERR " + e.message); }
-    const pre = document.createElement("pre");
-    pre.id = "probe-out2";
-    pre.textContent = out.join(" || ");
-    document.body.appendChild(pre);
-  })();
-});
