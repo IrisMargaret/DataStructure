@@ -33,6 +33,23 @@
   --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
 }
 
+/* 随包分发的思源宋体（Noto Serif CJK SC 子集，OFL 许可）：
+   保证安卓/桌面离线环境下的中文宋体观感；本地有 Times New Roman 时西文仍用 Times */
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("../fonts/NotoSerifSC-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+  src: url("../fonts/NotoSerifSC-Bold.woff2") format("woff2");
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }

@@ -247,7 +247,7 @@
           <div><dt>TF-IDF 相关度</dt>
             <dd>
               <div class="math" role="img" aria-label="score 等于对词条 t 的 tf 乘 idf 求和；idf 等于 ln(N+1 除以 df+1) 再加一">
-                <div class="mline">score(q, d) = <span class="sum">Σ</span><sub>t&nbsp;∈&nbsp;q&nbsp;∩&nbsp;d</sub>&nbsp; tf(t, d) &times; idf(t)</div>
+                <div class="mline">score(q, d) = <span class="sum">Σ</span><sub>对 q 与 d 共有的词条 t</sub>&nbsp; tf(t, d) &times; idf(t)</div>
                 <div class="mline">idf(t) = ln&thinsp;<span class="rm">(</span><span class="mfrac"><span class="top">N + 1</span><span class="bot">df(t) + 1</span></span><span class="rm">)</span> + 1，<span class="rm">　N = 论文总数，df(t) = 词条 t 的文档频率</span></div>
               </div>
             </dd>

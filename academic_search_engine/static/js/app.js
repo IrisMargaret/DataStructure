@@ -578,26 +578,35 @@ function finishSingle(d) {
 }
 
 async function uploadSingle() {
+  const file = $("#file-single").files[0];
+  const btn = $("#btn-file");
   const bridge = desktopBridge();
-  if (bridge) {          // 桌面窗口：走原生文件对话框 + 服务端直传
-    const d = await bridge.pickUpload($("#ai-single").checked ? 1 : 0);
-    if (d && d.cancelled) return;
-    finishSingle(d);
+  // 已通过文件区选中文件：与网页一致，直接上传（最可靠）
+  if (file) {
+    btn.disabled = true;
+    const form = new FormData();
+    form.append("file", file);
+    form.append("ai", $("#ai-single").checked ? "1" : "0");
+    try {
+      const d = await api("/api/papers/file", { method: "POST", body: form });
+      finishSingle(d);
+    } catch (err) {
+      toast("解析失败：" + err.message, "err");
+    } finally { btn.disabled = false; }
     return;
   }
-  const file = $("#file-single").files[0];
-  if (!file) return;
-  const btn = $("#btn-file");
-  btn.disabled = true;
-  const form = new FormData();
-  form.append("file", file);
-  form.append("ai", $("#ai-single").checked ? "1" : "0");
-  try {
-    const d = await api("/api/papers/file", { method: "POST", body: form });
-    finishSingle(d);
-  } catch (err) {
-    toast("解析失败：" + err.message, "err");
-  } finally { btn.disabled = false; }
+  // 桌面窗口若文件区不可用，则回退到原生文件对话框 + 服务端直传
+  if (bridge) {
+    try {
+      const d = await bridge.pickUpload($("#ai-single").checked ? 1 : 0);
+      if (!d || d.cancelled) return;
+      finishSingle(d);
+    } catch (err) {
+      toast("选择文件失败：" + (err && err.message ? err.message : err), "err");
+    }
+    return;
+  }
+  toast("请先点击虚线框选择论文文件", "err");
 }
 
 function renderZipReport(d) {
@@ -625,26 +634,33 @@ function finishZip(d) {
 }
 
 async function uploadZip() {
+  const file = $("#file-zip").files[0];
+  const btn = $("#btn-zip");
   const bridge = desktopBridge();
-  if (bridge) {          // 桌面窗口：原生对话框直传
-    const d = await bridge.pickUpload($("#ai-zip").checked ? 1 : 0);
-    if (d && d.cancelled) return;
-    finishZip(d);
+  if (file) {
+    btn.disabled = true;
+    const form = new FormData();
+    form.append("file", file);
+    form.append("ai", $("#ai-zip").checked ? "1" : "0");
+    try {
+      const d = await api("/api/papers/file", { method: "POST", body: form });
+      finishZip(d);
+    } catch (err) {
+      toast("导入失败：" + err.message, "err");
+    } finally { btn.disabled = false; }
     return;
   }
-  const file = $("#file-zip").files[0];
-  if (!file) return;
-  const btn = $("#btn-zip");
-  btn.disabled = true;
-  const form = new FormData();
-  form.append("file", file);
-  form.append("ai", $("#ai-zip").checked ? "1" : "0");
-  try {
-    const d = await api("/api/papers/file", { method: "POST", body: form });
-    finishZip(d);
-  } catch (err) {
-    toast("导入失败：" + err.message, "err");
-  } finally { btn.disabled = false; }
+  if (bridge) {
+    try {
+      const d = await bridge.pickUpload($("#ai-zip").checked ? 1 : 0);
+      if (!d || d.cancelled) return;
+      finishZip(d);
+    } catch (err) {
+      toast("选择文件失败：" + (err && err.message ? err.message : err), "err");
+    }
+    return;
+  }
+  toast("请先点击虚线框选择 ZIP 文件", "err");
 }
 
 function switchTab(name) {
