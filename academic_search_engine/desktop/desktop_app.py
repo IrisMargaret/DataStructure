@@ -104,7 +104,7 @@ def main():
     from werkzeug.serving import make_server
     try:
         app = create_app()
-    except Exception as exc:
+    except Exception:
         import traceback
         traceback.print_exc()
         _write_error_log(data_root, traceback.format_exc())

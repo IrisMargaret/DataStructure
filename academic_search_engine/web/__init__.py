@@ -7,8 +7,6 @@ create_app()：
 3. 注册路由蓝图与统一 JSON 错误处理。
 """
 
-import os
-
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
