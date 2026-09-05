@@ -7,6 +7,7 @@ create_app()：
 3. 注册路由蓝图与统一 JSON 错误处理。
 """
 
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -15,7 +16,10 @@ from flask_cors import CORS
 
 from .routes import register_routes
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# 项目根目录 = web 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向，
+# 使模板/静态资源/数据目录指向 App 私有解包目录）
+PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
+                    or Path(__file__).resolve().parent.parent)
 
 
 def create_app(service=None, auto_fetch=True):

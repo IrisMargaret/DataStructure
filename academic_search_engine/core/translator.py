@@ -11,11 +11,13 @@
 """
 
 import json
+import os
 import re
 from pathlib import Path
 
-# 项目根目录 = core 包的上层目录
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# 项目根目录 = core 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向）
+PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
+                    or Path(__file__).resolve().parent.parent)
 BILINGUAL_PATH = PROJECT_ROOT / "data" / "bilingual.json"
 
 _CJK_RE = re.compile(r"[\u4e00-\u9fff]")

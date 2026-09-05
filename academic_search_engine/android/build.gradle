@@ -1,0 +1,5 @@
+// 顶层构建文件：声明插件版本（AGP 9.0.1 + Chaquopy 17.0.0）
+plugins {
+    id 'com.android.application' version '9.0.1' apply false
+    id 'com.chaquo.python' version '17.0.0' apply false
+}

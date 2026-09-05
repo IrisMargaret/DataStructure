@@ -10,12 +10,15 @@
 """
 
 import json
+import os
 import re
 from pathlib import Path
 
 import arxiv
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# 项目根目录 = crawler 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向）
+PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
+                    or Path(__file__).resolve().parent.parent)
 PAPERS_PATH = PROJECT_ROOT / "data" / "papers.json"
 
 # 采集目标分类

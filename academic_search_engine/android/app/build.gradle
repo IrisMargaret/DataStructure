@@ -1,0 +1,99 @@
+plugins {
+    id 'com.android.application'
+    id 'com.chaquo.python'
+}
+
+android {
+    namespace 'com.academic.search'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.academic.search"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        ndk {
+            // Chaquopy 17 + Python 3.12 仅提供 arm64-v8a / x86_64 运行时
+            abiFilters "arm64-v8a", "x86_64"
+        }
+
+        python {
+            // 本机构建解释器（Python 3.12，与 Chaquopy 17 支持范围一致）
+            buildPython "C:/Users/marym/AppData/Local/Programs/Python/Python312/python.exe"
+            version "3.12"
+            pip {
+                // --no-cache-dir：规避 pip 本地 HTTP 缓存 304 重验证死锁；
+                // 超时/重试加大：pypi.org 网络波动时仍可完成下载；
+                // --find-links：jieba 在 PyPI 只有 sdist，而 Chaquopy pip
+                //   强制 --only-binary，故用本地预构建的 py3-none-any wheel
+                options "--no-cache-dir", "--timeout", "60", "--retries", "20",
+                        "--find-links", "C:/DataStructure/academic_search_engine/android/local-wheels"
+                install "flask"
+                install "flask-cors"
+                install "python-dotenv"
+                install "jieba"
+                install "arxiv"
+                install "PyPDF2"
+                install "pypdf"
+                install "requests"
+            }
+        }
+    }
+
+    signingConfigs {
+        // Debug keystore kept inside the project (sandbox cannot write ~/.android)
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        // 源码含中文注释：显式 UTF-8，避免 Windows 默认 GBK 导致乱码编译失败
+        encoding "UTF-8"
+    }
+    packaging {
+        jniLibs {
+            // Chaquopy 会把 libpython 等放入 jniLibs，不需要压缩排除
+        }
+    }
+}
+
+dependencies {
+    implementation "androidx.core:core:1.13.1"
+}
+
+// 把 android/sitecustomize.py 注入 Chaquopy 的构建 venv，使 pip 解包
+// 不被沙箱的 0o700 目录 ACL 限制卡死（见 sitecustomize.py 注释）。
+def pythonEnvSp = layout.buildDirectory.dir("python/env/debug/Lib/site-packages")
+tasks.register("injectSitecustomize") {
+    doLast {
+        def sp = pythonEnvSp.get().asFile
+        sp.mkdirs()
+        copy {
+            from "${rootProject.projectDir}/sitecustomize.py"
+            into sp
+        }
+    }
+}
+// 顺序：先解出构建 venv -> 注入 sitecustomize -> 再跑 pip 安装
+tasks.matching { it.name == "installDebugPythonRequirements" }.configureEach {
+    dependsOn "injectSitecustomize"
+}
+tasks.matching { it.name == "injectSitecustomize" }.configureEach {
+    dependsOn "extractDebugPythonBuildPackages"
+}

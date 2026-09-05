@@ -29,7 +29,9 @@ from core.preprocessor import Preprocessor
 from core.translator import Translator, detect_lang
 from core.trie import Trie
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# 项目根目录 = service 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向）
+PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
+                    or Path(__file__).resolve().parent.parent)
 PAPERS_PATH = PROJECT_ROOT / "data" / "papers.json"
 UPLOAD_DIR = PROJECT_ROOT / "uploads"
 FILES_DIR = PROJECT_ROOT / "data" / "papers_files"

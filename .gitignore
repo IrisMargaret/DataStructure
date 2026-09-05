@@ -1,0 +1,5 @@
+﻿# Build/test residue at repo root (sandbox-generated temp dirs)
+.build-tmp/
+buildtmp/
+.gradle-home/
+android-wheels/

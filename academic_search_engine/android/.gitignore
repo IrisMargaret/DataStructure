@@ -1,0 +1,10 @@
+﻿# Android build artifacts & local config (kept out of the public repo)
+.gradle-home/
+.gradle/
+build/
+app/build/
+local.properties
+.idea/
+*.iml
+build_log*.txt
+*.apk

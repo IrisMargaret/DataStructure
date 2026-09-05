@@ -1,0 +1,689 @@
+{
+ "pairs": [
+  [
+   "convolution",
+   "卷积"
+  ],
+  [
+   "pooling",
+   "池化"
+  ],
+  [
+   "convolutional neural network",
+   "卷积神经网络"
+  ],
+  [
+   "neural network",
+   "神经网络"
+  ],
+  [
+   "deep learning",
+   "深度学习"
+  ],
+  [
+   "machine learning",
+   "机器学习"
+  ],
+  [
+   "reinforcement learning",
+   "强化学习"
+  ],
+  [
+   "supervised learning",
+   "监督学习"
+  ],
+  [
+   "unsupervised learning",
+   "无监督学习"
+  ],
+  [
+   "semi-supervised learning",
+   "半监督学习"
+  ],
+  [
+   "transfer learning",
+   "迁移学习"
+  ],
+  [
+   "federated learning",
+   "联邦学习"
+  ],
+  [
+   "representation learning",
+   "表示学习"
+  ],
+  [
+   "self-supervised learning",
+   "自监督学习"
+  ],
+  [
+   "meta learning",
+   "元学习"
+  ],
+  [
+   "graph",
+   "图"
+  ],
+  [
+   "graph neural network",
+   "图神经网络"
+  ],
+  [
+   "graph attention network",
+   "图注意力网络"
+  ],
+  [
+   "knowledge graph",
+   "知识图谱"
+  ],
+  [
+   "attention",
+   "注意力"
+  ],
+  [
+   "attention mechanism",
+   "注意力机制"
+  ],
+  [
+   "self-attention",
+   "自注意力"
+  ],
+  [
+   "transformer",
+   "变换器"
+  ],
+  [
+   "transformer",
+   "Transformer"
+  ],
+  [
+   "transformer model",
+   "变换器模型"
+  ],
+  [
+   "large language model",
+   "大语言模型"
+  ],
+  [
+   "language model",
+   "语言模型"
+  ],
+  [
+   "generative model",
+   "生成式模型"
+  ],
+  [
+   "diffusion model",
+   "扩散模型"
+  ],
+  [
+   "adversarial network",
+   "对抗网络"
+  ],
+  [
+   "generative adversarial network",
+   "生成对抗网络"
+  ],
+  [
+   "image classification",
+   "图像分类"
+  ],
+  [
+   "object detection",
+   "目标检测"
+  ],
+  [
+   "image segmentation",
+   "图像分割"
+  ],
+  [
+   "semantic segmentation",
+   "语义分割"
+  ],
+  [
+   "image generation",
+   "图像生成"
+  ],
+  [
+   "image retrieval",
+   "图像检索"
+  ],
+  [
+   "image",
+   "图像"
+  ],
+  [
+   "computer vision",
+   "计算机视觉"
+  ],
+  [
+   "natural language processing",
+   "自然语言处理"
+  ],
+  [
+   "text classification",
+   "文本分类"
+  ],
+  [
+   "text generation",
+   "文本生成"
+  ],
+  [
+   "machine translation",
+   "机器翻译"
+  ],
+  [
+   "question answering",
+   "问答"
+  ],
+  [
+   "sentiment analysis",
+   "情感分析"
+  ],
+  [
+   "named entity recognition",
+   "命名实体识别"
+  ],
+  [
+   "information retrieval",
+   "信息检索"
+  ],
+  [
+   "recommender system",
+   "推荐系统"
+  ],
+  [
+   "collaborative filtering",
+   "协同过滤"
+  ],
+  [
+   "classification",
+   "分类"
+  ],
+  [
+   "regression",
+   "回归"
+  ],
+  [
+   "clustering",
+   "聚类"
+  ],
+  [
+   "feature extraction",
+   "特征提取"
+  ],
+  [
+   "feature selection",
+   "特征选择"
+  ],
+  [
+   "dimensionality reduction",
+   "降维"
+  ],
+  [
+   "embedding",
+   "嵌入"
+  ],
+  [
+   "word embedding",
+   "词嵌入"
+  ],
+  [
+   "encoder",
+   "编码器"
+  ],
+  [
+   "decoder",
+   "解码器"
+  ],
+  [
+   "sequence",
+   "序列"
+  ],
+  [
+   "sentence",
+   "句子"
+  ],
+  [
+   "document",
+   "文档"
+  ],
+  [
+   "token",
+   "词元"
+  ],
+  [
+   "corpus",
+   "语料库"
+  ],
+  [
+   "vocabulary",
+   "词表"
+  ],
+  [
+   "training",
+   "训练"
+  ],
+  [
+   "testing",
+   "测试"
+  ],
+  [
+   "validation",
+   "验证"
+  ],
+  [
+   "optimization",
+   "优化"
+  ],
+  [
+   "optimizer",
+   "优化器"
+  ],
+  [
+   "loss function",
+   "损失函数"
+  ],
+  [
+   "gradient",
+   "梯度"
+  ],
+  [
+   "gradient descent",
+   "梯度下降"
+  ],
+  [
+   "backpropagation",
+   "反向传播"
+  ],
+  [
+   "overfitting",
+   "过拟合"
+  ],
+  [
+   "underfitting",
+   "欠拟合"
+  ],
+  [
+   "regularization",
+   "正则化"
+  ],
+  [
+   "dropout",
+   "丢弃"
+  ],
+  [
+   "batch normalization",
+   "批归一化"
+  ],
+  [
+   "layer normalization",
+   "层归一化"
+  ],
+  [
+   "activation function",
+   "激活函数"
+  ],
+  [
+   "parameter",
+   "参数"
+  ],
+  [
+   "hyperparameter",
+   "超参数"
+  ],
+  [
+   "benchmark",
+   "基准"
+  ],
+  [
+   "evaluation",
+   "评估"
+  ],
+  [
+   "metric",
+   "指标"
+  ],
+  [
+   "accuracy",
+   "准确率"
+  ],
+  [
+   "precision",
+   "精确率"
+  ],
+  [
+   "recall",
+   "召回率"
+  ],
+  [
+   "f1 score",
+   "f1值"
+  ],
+  [
+   "loss",
+   "损失"
+  ],
+  [
+   "network",
+   "网络"
+  ],
+  [
+   "model",
+   "模型"
+  ],
+  [
+   "architecture",
+   "架构"
+  ],
+  [
+   "layer",
+   "层"
+  ],
+  [
+   "algorithm",
+   "算法"
+  ],
+  [
+   "dataset",
+   "数据集"
+  ],
+  [
+   "data",
+   "数据"
+  ],
+  [
+   "sample",
+   "样本"
+  ],
+  [
+   "label",
+   "标签"
+  ],
+  [
+   "annotation",
+   "标注"
+  ],
+  [
+   "supervision",
+   "监督"
+  ],
+  [
+   "prediction",
+   "预测"
+  ],
+  [
+   "inference",
+   "推理"
+  ],
+  [
+   "search",
+   "检索"
+  ],
+  [
+   "similarity",
+   "相似度"
+  ],
+  [
+   "ranking",
+   "排序"
+  ],
+  [
+   "sparse",
+   "稀疏"
+  ],
+  [
+   "dense",
+   "稠密"
+  ],
+  [
+   "knowledge",
+   "知识"
+  ],
+  [
+   "semantic",
+   "语义"
+  ],
+  [
+   "multimodal",
+   "多模态"
+  ],
+  [
+   "speech recognition",
+   "语音识别"
+  ],
+  [
+   "recommendation",
+   "推荐"
+  ],
+  [
+   "personalization",
+   "个性化"
+  ],
+  [
+   "visualization",
+   "可视化"
+  ],
+  [
+   "interactive",
+   "交互"
+  ],
+  [
+   "molecular",
+   "分子"
+  ],
+  [
+   "drug discovery",
+   "药物发现"
+  ],
+  [
+   "healthcare",
+   "医疗"
+  ],
+  [
+   "medical image",
+   "医学图像"
+  ],
+  [
+   "time series",
+   "时间序列"
+  ],
+  [
+   "anomaly detection",
+   "异常检测"
+  ],
+  [
+   "outlier",
+   "离群点"
+  ],
+  [
+   "privacy",
+   "隐私"
+  ],
+  [
+   "security",
+   "安全"
+  ],
+  [
+   "robustness",
+   "鲁棒性"
+  ],
+  [
+   "fairness",
+   "公平性"
+  ],
+  [
+   "interpretability",
+   "可解释性"
+  ],
+  [
+   "explainability",
+   "可解释性"
+  ],
+  [
+   "knowledge distillation",
+   "知识蒸馏"
+  ],
+  [
+   "quantization",
+   "量化"
+  ],
+  [
+   "pruning",
+   "剪枝"
+  ],
+  [
+   "lightweight",
+   "轻量"
+  ],
+  [
+   "efficiency",
+   "效率"
+  ],
+  [
+   "real-time",
+   "实时"
+  ],
+  [
+   "edge computing",
+   "边缘计算"
+  ],
+  [
+   "cloud",
+   "云端"
+  ],
+  [
+   "distributed",
+   "分布式"
+  ],
+  [
+   "parallel",
+   "并行"
+  ],
+  [
+   "graph database",
+   "图数据库"
+  ],
+  [
+   "database",
+   "数据库"
+  ],
+  [
+   "index",
+   "索引"
+  ],
+  [
+   "inverted index",
+   "倒排索引"
+  ],
+  [
+   "search engine",
+   "搜索引擎"
+  ],
+  [
+   "web search",
+   "网页搜索"
+  ],
+  [
+   "query",
+   "查询"
+  ],
+  [
+   "relevance",
+   "相关性"
+  ],
+  [
+   "sorting",
+   "排序"
+  ],
+  [
+   "hashing",
+   "哈希"
+  ],
+  [
+   "similarity search",
+   "相似检索"
+  ],
+  [
+   "retrieval",
+   "检索"
+  ],
+  [
+   "augmented generation",
+   "增强生成"
+  ],
+  [
+   "generation",
+   "生成"
+  ],
+  [
+   "prompt",
+   "提示"
+  ],
+  [
+   "fine-tuning",
+   "微调"
+  ],
+  [
+   "pretraining",
+   "预训练"
+  ],
+  [
+   "zero-shot",
+   "零样本"
+  ],
+  [
+   "few-shot",
+   "少样本"
+  ],
+  [
+   "chain of thought",
+   "思维链"
+  ],
+  [
+   "reasoning",
+   "推理"
+  ],
+  [
+   "planning",
+   "规划"
+  ],
+  [
+   "agent",
+   "智能体"
+  ],
+  [
+   "multi-agent",
+   "多智能体"
+  ],
+  [
+   "robot",
+   "机器人"
+  ],
+  [
+   "autonomous driving",
+   "自动驾驶"
+  ],
+  [
+   "physics",
+   "物理"
+  ],
+  [
+   "chemistry",
+   "化学"
+  ],
+  [
+   "biology",
+   "生物"
+  ],
+  [
+   "survey",
+   "综述"
+  ],
+  [
+   "review",
+   "综述"
+  ]
+ ],
+ "note": "中英论文关键词互译词典（en 侧小写）"
+}
