@@ -388,7 +388,7 @@ a.result-title:hover { color: var(--accent-deep); }
 
 /* 空态 */
 .empty { text-align: center; color: var(--muted); padding: 46px 0; }
-.empty .glyph { font-family: var(--serif, serif); font-size: 38px; color: var(--line-strong); line-height: 1; margin-bottom: 8px; }
+.empty .glyph { font-family: var(--sans); font-size: 38px; color: var(--line-strong); line-height: 1; margin-bottom: 8px; }
 
 /* ---------------- 文库 ---------------- */
 
