@@ -129,8 +129,56 @@ def main():
         webbrowser.open(url)
         return _hold_and_serve(server, url)
 
+    class FileBridge:
+        """前端桥：原生文件对话框 + 服务端直传（pywebview 窗口内 file input 不可靠）。"""
+
+        def __init__(self, base_url):
+            self._base = base_url
+            self._win = None
+
+        def attach(self, win):
+            self._win = win
+
+        def pick_upload(self, ai):
+            if self._win is None:
+                return {"error": "窗口尚未就绪，请重试"}
+            files = self._win.create_file_dialog(
+                webview.OPEN_DIALOG,
+                allow_multiple=False,
+                file_types=("Documents (*.pdf;*.txt;*.md;*.zip)",),
+            )
+            if not files:
+                return {"cancelled": True}
+            path = files[0]
+            return self._post(path, 1 if ai else 0)
+
+        def _post(self, path, ai):
+            import os
+            import requests
+            try:
+                with open(path, "rb") as fh:
+                    resp = requests.post(
+                        self._base + "/api/papers/file",
+                        files={"file": (os.path.basename(path), fh)},
+                        data={"ai": str(ai)},
+                        timeout=300,
+                    )
+                try:
+                    data = resp.json()
+                except Exception:
+                    data = {}
+                if not isinstance(data, dict):
+                    data = {}
+                if resp.status_code >= 400:
+                    data["error"] = data.get("error") or (
+                        "服务器返回异常（HTTP %d）" % resp.status_code)
+                return data
+            except Exception as exc:
+                return {"error": "上传失败：%s" % exc}
+
+    bridge = FileBridge(url)
     try:
-        webview.create_window(
+        win = webview.create_window(
             "学术论文检索",
             url,
             width=1180,
@@ -138,7 +186,9 @@ def main():
             min_size=(980, 620),
             resizable=True,
             background_color="#f6f4ee",
+            js_api=bridge,
         )
+        bridge.attach(win)
         webview.start()
         print("[desktop] 窗口已关闭，退出。")
     except Exception as exc:

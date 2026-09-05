@@ -22,8 +22,10 @@
   --topbar-h: 52px;
   --radius: 12px;
   --shadow: 0 1px 2px rgba(38, 35, 30, .05), 0 10px 28px rgba(38, 35, 30, .06);
-  --sans: -apple-system, "Segoe UI", "PingFang SC", "HarmonyOS Sans SC",
-    "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  /* 全站衬线排版：中文宋体、西文 Times New Roman */
+  --sans: "Times New Roman", Times, Georgia,
+    "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "STSong",
+    "Microsoft YaHei", serif;
   --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
 }
 
@@ -153,7 +155,7 @@ button { font: inherit; color: inherit; }
   padding: 10px 16px; display: flex; align-items: baseline; gap: 9px;
   min-width: 0;
 }
-.stat .num { font-family: var(--mono); font-size: 20px; font-weight: 800; }
+.stat .num { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stat .lbl { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .stat .chev { color: var(--muted); font-size: 12px; margin-left: auto; }
 .stat-link {
@@ -312,8 +314,8 @@ button { font: inherit; color: inherit; }
 .result-title { font-size: 16.5px; font-weight: 800; line-height: 1.45; color: var(--ink); }
 a.result-title:hover { color: var(--accent-deep); }
 .score {
-  font-family: var(--mono); font-size: 11.5px; color: var(--accent-deep);
-  background: var(--accent-soft); border-radius: 999px; padding: 2px 10px; white-space: nowrap; flex-shrink: 0;
+  font-size: 12px; color: var(--accent-deep);
+  background: var(--accent-soft); border-radius: 999px; padding: 2px 11px; white-space: nowrap; flex-shrink: 0;
 }
 .result-meta { font-size: 12.5px; color: var(--muted); margin: 6px 0 7px; }
 .result-abstract {
@@ -324,7 +326,7 @@ a.result-title:hover { color: var(--accent-deep); }
 .expand { border: none; background: none; color: var(--accent-deep); font-size: 12.5px; cursor: pointer; padding: 3px 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .chip {
-  font-family: var(--mono); font-size: 11.5px; border: 1px solid var(--line-strong);
+  font-size: 12.5px; border: 1px solid var(--line-strong);
   border-radius: 999px; padding: 2px 10px; color: var(--soft);
 }
 .chip .hit { color: var(--accent-deep); font-weight: 700; }
@@ -353,7 +355,7 @@ a.result-title:hover { color: var(--accent-deep); }
 .trace .strategy { color: var(--soft); font-size: 12.8px; margin-bottom: 8px; }
 .trace-table { width: 100%; border-collapse: collapse; font-size: 12.6px; }
 .trace-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 4px 10px 6px 0; border-bottom: 1px solid var(--line-strong); }
-.trace-table td { padding: 5px 10px 5px 0; border-bottom: 1px dashed var(--line); font-family: var(--mono); }
+.trace-table td { padding: 5px 10px 5px 0; border-bottom: 1px dashed var(--line); }
 .trace-table td:last-child { text-align: right; }
 .trace pre.ast {
   margin-top: 10px; background: var(--surface); border: 1px solid var(--line);
@@ -380,7 +382,7 @@ a.result-title:hover { color: var(--accent-deep); }
 .paper-row .pid { display: none; }
 .paper-row .tt { font-size: 15px; font-weight: 800; line-height: 1.45; color: var(--ink); }
 .paper-row .au { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-.paper-row .yr { font-family: var(--mono); font-size: 13px; color: var(--soft); white-space: nowrap; }
+.paper-row .yr { font-size: 13.5px; color: var(--soft); white-space: nowrap; }
 .paper-row .kwcell { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
 .paper-row .act {
   grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap;
@@ -421,7 +423,7 @@ a.result-title:hover { color: var(--accent-deep); }
   border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: 18px;
   text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s;
 }
-.file-drop:hover, .file-drop.has { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep); }
+.file-drop:hover, .file-drop.has, .file-drop.drag { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep); }
 .file-drop .fname { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
 .file-drop input { display: none; }
 
@@ -503,7 +505,7 @@ pre.fig {
 .trow:hover { background: var(--accent-soft); }
 .trow .tk { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trow .ts { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-.trow .td { font-family: var(--mono); font-size: 12px; color: var(--soft); text-align: right; white-space: nowrap; }
+.trow .td { font-size: 13px; color: var(--soft); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .terms-more { margin-top: 12px; text-align: center; }
 .terms-empty { color: var(--muted); text-align: center; padding: 22px 0; font-size: 13px; }
 
@@ -571,3 +573,21 @@ pre.fig {
   .card { padding: 15px; }
   .result-title { font-size: 15.5px; }
 }
+
+/* ---------------- 鍏紡鎺掔増锛堣‖绾挎暟瀛︿綋锛?---------------- */
+.math {
+  font-family: var(--sans); font-style: italic; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; margin-top: 10px; text-align: center;
+}
+.math .mline { font-size: 17px; line-height: 2.1; }
+.math .mline + .mline { margin-top: 6px; }
+.math .rm { font-style: normal; }
+.math sub, .math sup { font-size: 11px; font-style: normal; }
+.mfrac {
+  display: inline-flex; flex-direction: column; vertical-align: middle;
+  text-align: center; margin: 0 3px; line-height: 1.15;
+}
+.mfrac .top { border-bottom: 1px solid var(--ink); padding: 0 8px 1px; font-size: 13px; }
+.mfrac .bot { padding: 1px 8px 0; font-size: 13px; }
+.math .sum { font-size: 24px; vertical-align: -6px; padding: 0 2px; }

@@ -32492,5 +32492,30 @@
     "file_store": "data/papers_files/1125_55b43d43.pdf",
     "language": null,
     "source": "upload"
+  },
+  {
+    "id": 1126,
+    "source_id": null,
+    "url": null,
+    "title": "Attention-Free Transformer Analysis",
+    "abstract": "We analyze attention-free transformer variants for sequence modelling with benchmarks.",
+    "authors": [
+      "John Q. Author"
+    ],
+    "year": 2024,
+    "keywords": [
+      "attention-free",
+      "transformer",
+      "analysis",
+      "variants",
+      "analyze",
+      "sequence",
+      "benchmarks",
+      "modelling"
+    ],
+    "file_name": "upload_demo.txt",
+    "file_store": "data/papers_files/1126_44c73ce2.txt",
+    "language": null,
+    "source": "upload"
   }
 ]

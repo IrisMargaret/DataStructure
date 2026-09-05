@@ -21,6 +21,8 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
@@ -74,6 +76,7 @@ public class MainActivity extends Activity {
         webView = new WebView(this);
         configureWebView();
         setContentView(webView);
+        applySystemBarInsets();
 
         ensurePermissions();
 
@@ -103,6 +106,22 @@ public class MainActivity extends Activity {
                 });
             }
         }, "server-bootstrap").start();
+    }
+
+    // ---------------- 系统栏内边距（防顶部/底部重叠） ----------------
+
+    /**
+     * 系统栏内边距兜底：若窗口把内容绘制到状态栏/导航栏之下（Android 15+ 强制边到边，
+     * 或个别厂商手势模式），insets 会给出非零顶部/底部高度，此处为 WebView 补上，
+     * 保证顶栏不与系统下拉区重叠。窗口已适配时 insets 为 0，不影响布局。
+     */
+    private void applySystemBarInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
+            androidx.core.graphics.Insets bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, bars.top, 0, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     // ---------------- Permissions ----------------

@@ -513,12 +513,40 @@ async function showPaperDetail(id) {
 
 function bindFilePick(inputId, labelId, btnId) {
   const input = $(inputId);
-  input.addEventListener("change", () => {
-    const f = input.files[0];
-    $(labelId).textContent = f ? "已选择：" + f.name : "点击选择文件";
-    $(labelId).parentElement.classList.toggle("has", !!f);
+  const zone = $(labelId).closest(".file-drop") || $(labelId).parentElement;
+  const sync = () => {
+    const f = input.files && input.files[0];
+    $(labelId).textContent = f ? "已选择：" + f.name : "点击选择文件（或拖拽文件到此处）";
+    zone.classList.toggle("has", !!f);
     $(btnId).disabled = !f;
+  };
+  input.addEventListener("change", sync);
+  // 点击整块区域弹出文件选择器（兼容 WebView/桌面窗口，避免双击弹两次）
+  zone.addEventListener("click", (e) => {
+    e.preventDefault();
+    input.click();
   });
+  ["dragenter", "dragover"].forEach((ev) =>
+    zone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      zone.classList.add("drag");
+    }));
+  ["dragleave", "drop"].forEach((ev) =>
+    zone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      zone.classList.remove("drag");
+    }));
+  zone.addEventListener("drop", (e) => {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(f);
+      input.files = dt.files;
+    } catch (_) { /* 老内核不支持拖拽赋值，请点选 */ }
+    sync();
+  });
+  sync();
 }
 
 function resetFileInput(inputId, labelId, btnId) {
@@ -541,7 +569,35 @@ function showMsg(html) {
   el.innerHTML = html;
 }
 
+function desktopBridge() {
+  return (window.pywebview && window.pywebview.api
+    && window.pywebview.api.pickUpload) ? window.pywebview.api : null;
+}
+
+function finishSingle(d) {
+  if (!d) return;
+  if (d.error) { showReport("解析失败", d.error); toast("解析失败：" + d.error, "err"); return; }
+  if (d.ok === false && d.duplicate) {
+    showReport("该文献已存在，未重复入库",
+      "已有论文 #" + d.existing.paper_id + "「" + d.existing.title + "」内容完全一致");
+    toast("重复导入已拦截（#" + d.existing.paper_id + "）", "err");
+  } else if (d.paper) {
+    showReport("已入库「" + d.paper.title + "」",
+      "置信度 " + d.confidence + (d.ai_used ? " · AI 精修" : " · 规则拆解"));
+    toast("入库成功", "ok");
+  }
+  resetFileInput("#file-single", "#file-single-name", "#btn-file");
+  refreshStats(); loadLibrary();
+}
+
 async function uploadSingle() {
+  const bridge = desktopBridge();
+  if (bridge) {          // 桌面窗口：走原生文件对话框 + 服务端直传
+    const d = await bridge.pickUpload($("#ai-single").checked ? 1 : 0);
+    if (d && d.cancelled) return;
+    finishSingle(d);
+    return;
+  }
   const file = $("#file-single").files[0];
   if (!file) return;
   const btn = $("#btn-file");
@@ -551,22 +607,44 @@ async function uploadSingle() {
   form.append("ai", $("#ai-single").checked ? "1" : "0");
   try {
     const d = await api("/api/papers/file", { method: "POST", body: form });
-    if (d.ok === false && d.duplicate) {
-      showReport("该文献已存在，未重复入库",
-        "已有论文 #" + d.existing.paper_id + "「" + d.existing.title + "」内容完全一致");
-      toast("重复导入已拦截（#" + d.existing.paper_id + "）", "err");
-    } else {
-      showReport("已入库「" + d.paper.title + "」",
-        "置信度 " + d.confidence + (d.ai_used ? " · AI 精修" : " · 规则拆解"));
-    }
-    resetFileInput("#file-single", "#file-single-name", "#btn-file");
-    refreshStats(); loadLibrary();
+    finishSingle(d);
   } catch (err) {
     toast("解析失败：" + err.message, "err");
   } finally { btn.disabled = false; }
 }
 
+function renderZipReport(d) {
+  const added = (d.added || []).map((a) =>
+    '<li><span class="ok">＋</span> ' + escapeHtml(a.name) + " → " + escapeHtml(a.title) + "</li>").join("");
+  const duplicated = (d.duplicated || []).map((x) =>
+    '<li><span class="bad">＝</span> ' + escapeHtml(x.name) + "：与 #" + x.paper_id +
+    "「" + escapeHtml(x.title) + "」一致，已跳过</li>").join("");
+  const failed = (d.failed || []).map((f) =>
+    '<li><span class="bad">－</span> ' + escapeHtml(f.name) + "：" + escapeHtml(f.error) + "</li>").join("");
+  showReport("ZIP 导入完成", "");
+  $("#report").insertAdjacentHTML("beforeend",
+    '<div class="ok">成功 ' + (d.added || []).length + " · 重复跳过 " +
+    (d.duplicated || []).length + " · 失败 " + (d.failed || []).length + "</div><ul>" +
+    added + duplicated + failed + "</ul>");
+}
+
+function finishZip(d) {
+  if (!d) return;
+  if (d.error) { showReport("ZIP 导入失败", d.error); toast(d.error, "err"); return; }
+  renderZipReport(d);
+  resetFileInput("#file-zip", "#file-zip-name", "#btn-zip");
+  refreshStats(); loadLibrary();
+  toast("ZIP 导入完成", "ok");
+}
+
 async function uploadZip() {
+  const bridge = desktopBridge();
+  if (bridge) {          // 桌面窗口：原生对话框直传
+    const d = await bridge.pickUpload($("#ai-zip").checked ? 1 : 0);
+    if (d && d.cancelled) return;
+    finishZip(d);
+    return;
+  }
   const file = $("#file-zip").files[0];
   if (!file) return;
   const btn = $("#btn-zip");
@@ -576,20 +654,7 @@ async function uploadZip() {
   form.append("ai", $("#ai-zip").checked ? "1" : "0");
   try {
     const d = await api("/api/papers/file", { method: "POST", body: form });
-    const added = (d.added || []).map((a) =>
-      '<li><span class="ok">＋</span> ' + escapeHtml(a.name) + " → " + escapeHtml(a.title) + "</li>").join("");
-    const duplicated = (d.duplicated || []).map((x) =>
-      '<li><span class="bad">＝</span> ' + escapeHtml(x.name) + "：与 #" + x.paper_id +
-      "「" + escapeHtml(x.title) + "」一致，已跳过</li>").join("");
-    const failed = (d.failed || []).map((f) =>
-      '<li><span class="bad">－</span> ' + escapeHtml(f.name) + "：" + escapeHtml(f.error) + "</li>").join("");
-    showReport("ZIP 导入完成", "");
-    $("#report").insertAdjacentHTML("beforeend",
-      '<div class="ok">成功 ' + (d.added || []).length + " · 重复跳过 " +
-      (d.duplicated || []).length + " · 失败 " + (d.failed || []).length + "</div><ul>" +
-      added + duplicated + failed + "</ul>");
-    resetFileInput("#file-zip", "#file-zip-name", "#btn-zip");
-    refreshStats(); loadLibrary();
+    finishZip(d);
   } catch (err) {
     toast("导入失败：" + err.message, "err");
   } finally { btn.disabled = false; }
