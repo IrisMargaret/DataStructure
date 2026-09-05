@@ -16,12 +16,14 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.chaquo.python.Python;
@@ -75,8 +77,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
         configureWebView();
-        setContentView(webView);
-        applySystemBarInsets();
+        FrameLayout content = new FrameLayout(this);
+        content.addView(webView, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(content);
+        applySystemBarInsets(content);
 
         ensurePermissions();
 
@@ -106,22 +112,6 @@ public class MainActivity extends Activity {
                 });
             }
         }, "server-bootstrap").start();
-    }
-
-    // ---------------- 系统栏内边距（防顶部/底部重叠） ----------------
-
-    /**
-     * 系统栏内边距兜底：若窗口把内容绘制到状态栏/导航栏之下（Android 15+ 强制边到边，
-     * 或个别厂商手势模式），insets 会给出非零顶部/底部高度，此处为 WebView 补上，
-     * 保证顶栏不与系统下拉区重叠。窗口已适配时 insets 为 0，不影响布局。
-     */
-    private void applySystemBarInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
-            androidx.core.graphics.Insets bars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars());
-            v.setPadding(0, bars.top, 0, bars.bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
     }
 
     // ---------------- Permissions ----------------
@@ -244,6 +234,25 @@ public class MainActivity extends Activity {
         }
         throw new IllegalStateException(
                 "Flask not ready within " + (SERVER_TIMEOUT_MS / 1000) + "s");
+    }
+
+    // ---------------- 系统栏安全间距 ----------------
+
+    /**
+     * 让内容按系统栏 insets 整体避让：用一个 FrameLayout 承载 WebView，
+     * 为容器设置状态栏/导航栏内边距。此方案不依赖 WebView 是否支持
+     * env(safe-area-inset-*)，兼容各版本与厂商；Android 15+ 强制边到边下
+     * 内容不再与系统下拉区/手势区重叠。
+     */
+    private void applySystemBarInsets(FrameLayout content) {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {
+            androidx.core.graphics.Insets bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, bars.top, 0, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
+        content.requestApplyInsets();
     }
 
     // ---------------- Error surfacing ----------------

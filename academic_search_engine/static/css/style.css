@@ -21,6 +21,9 @@
   --danger-soft: #f9e9e5;
   --topbar-h: 52px;
   --radius: 12px;
+  /* 系统栏安全间距：由 Android MainActivity 按 insets 注入；桌面/浏览器为 0 */
+  --sb-top: env(safe-area-inset-top, 0px);
+  --sb-bottom: env(safe-area-inset-bottom, 0px);
   --shadow: 0 1px 2px rgba(38, 35, 30, .05), 0 10px 28px rgba(38, 35, 30, .06);
   /* 全站衬线排版：中文宋体、西文 Times New Roman */
   --sans: "Times New Roman", Times, Georgia,
@@ -54,7 +57,8 @@ button { font: inherit; color: inherit; }
 /* ---------------- 顶栏 ---------------- */
 
 .topbar {
-  position: fixed; inset: 0 0 auto 0; height: var(--topbar-h);
+  position: fixed; top: var(--sb-top);
+  left: 0; right: 0; bottom: auto; height: var(--topbar-h);
   background: var(--surface); border-bottom: 1px solid var(--line);
   display: flex; align-items: center; padding: 0 max(14px, env(safe-area-inset-left));
   z-index: 90;
@@ -74,7 +78,7 @@ button { font: inherit; color: inherit; }
   display: flex; align-items: stretch; justify-content: space-around;
   left: 0; right: 0; bottom: 0;
   border-top: 1px solid var(--line);
-  padding: 4px env(safe-area-inset-right) calc(4px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+  padding: 4px env(safe-area-inset-right) calc(4px + var(--sb-bottom)) env(safe-area-inset-left);
   gap: 2px;
 }
 .nav-item {
@@ -93,7 +97,7 @@ button { font: inherit; color: inherit; }
 @media (max-height: 520px) {
   .topbar { display: none; }
   .nav {
-    flex-direction: row; top: 0; bottom: auto; height: 46px;
+    flex-direction: row; top: var(--sb-top); bottom: auto; height: 46px;
     border-top: none; border-bottom: 1px solid var(--line);
     padding: 2px max(6px, env(safe-area-inset-left)) 2px max(6px, env(safe-area-inset-right));
     justify-content: flex-start; overflow-x: auto;
@@ -125,8 +129,8 @@ button { font: inherit; color: inherit; }
 /* ---------------- 主内容区（各断点留出导航空间） ---------------- */
 
 .main {
-  padding: calc(var(--topbar-h) + 16px) 16px
-    calc(96px + env(safe-area-inset-bottom));
+  padding: calc(var(--topbar-h) + 16px + var(--sb-top)) 16px
+    calc(96px + var(--sb-bottom));
 }
 .page { max-width: 1080px; margin: 0 auto; }
 .page-head { margin: 4px 2px 16px; }
@@ -134,14 +138,15 @@ button { font: inherit; color: inherit; }
 .page-head p { color: var(--soft); font-size: 13.5px; margin-top: 4px; max-width: 640px; }
 
 @media (max-height: 520px) {
-  .main { padding: 58px 16px 30px; }
+  .main { padding: calc(58px + var(--sb-top)) 16px 30px; }
   .page-head h2 { font-size: 20px; }
 }
 @media (min-width: 760px) and (min-height: 520px) {
   .main { padding-left: calc(68px + 22px); }
 }
 @media (min-width: 1080px) and (min-height: 520px) {
-  .main { padding: calc(var(--topbar-h) + 26px) 40px 64px; padding-left: calc(232px + 44px); }
+  .main { padding: calc(var(--topbar-h) + 26px + var(--sb-top)) 40px
+    calc(64px + var(--sb-bottom)); padding-left: calc(232px + 44px); }
   .page-head { margin-bottom: 22px; }
   .page-head h2 { font-size: 27px; }
   .page-head p { font-size: 14px; }
@@ -548,7 +553,7 @@ pre.fig {
 /* ---------------- Toast ---------------- */
 
 .toast {
-  position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom));
+  position: fixed; left: 50%; bottom: calc(84px + var(--sb-bottom));
   transform: translateX(-50%); z-index: 220; background: var(--ink); color: #f7f3ea;
   padding: 11px 20px; border-radius: 12px; font-size: 13.5px; max-width: 82%; text-align: center;
   box-shadow: 0 10px 30px rgba(20, 16, 10, .25);
