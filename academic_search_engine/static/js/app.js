@@ -569,9 +569,15 @@ function finishSingle(d) {
       "已有论文 #" + d.existing.paper_id + "「" + d.existing.title + "」内容完全一致");
     toast("重复导入已拦截（#" + d.existing.paper_id + "）", "err");
   } else if (d.paper) {
-    showReport("已入库「" + d.paper.title + "」",
-      "置信度 " + d.confidence + (d.ai_used ? " · AI 精修" : " · 规则拆解"));
-    toast("入库成功", "ok");
+    if (d.note) {
+      showReport("已入库（待完善）「" + d.paper.title + "」",
+        d.note + "。原文件已归档，可删除后重传可解析版本，或用「AI 精修/手动填写」补全。");
+      toast("已按文件名建立条目（未能自动解析）", "ok");
+    } else {
+      showReport("已入库「" + d.paper.title + "」",
+        "置信度 " + d.confidence + (d.ai_used ? " · AI 精修" : " · 规则拆解"));
+      toast("入库成功", "ok");
+    }
   }
   resetFileInput("#file-single", "#file-single-name", "#btn-file");
   refreshStats(); loadLibrary();
@@ -611,7 +617,8 @@ async function uploadSingle() {
 
 function renderZipReport(d) {
   const added = (d.added || []).map((a) =>
-    '<li><span class="ok">＋</span> ' + escapeHtml(a.name) + " → " + escapeHtml(a.title) + "</li>").join("");
+    '<li><span class="ok">＋</span> ' + escapeHtml(a.name) + " → " + escapeHtml(a.title) +
+    (a.note ? ' <span style="color:var(--muted)">（' + escapeHtml(a.note) + "）</span>" : "") + "</li>").join("");
   const duplicated = (d.duplicated || []).map((x) =>
     '<li><span class="bad">＝</span> ' + escapeHtml(x.name) + "：与 #" + x.paper_id +
     "「" + escapeHtml(x.title) + "」一致，已跳过</li>").join("");

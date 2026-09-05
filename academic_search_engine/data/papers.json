@@ -32517,5 +32517,117 @@
     "file_store": "data/papers_files/1126_44c73ce2.txt",
     "language": null,
     "source": "upload"
+  },
+  {
+    "id": 1127,
+    "source_id": null,
+    "url": null,
+    "title": "OmniPart: Part-Aware 3D Generation with Semantic Decoupling and Structural Cohesion",
+    "abstract": "YUNHAN YANG∗, The University of Hong Kong, China YUFAN ZHOU∗, Harbin Institute of Technology, China YUAN-CHEN GUO, VAST, China ZI-XIN ZOU, VAST, China YUKUN HUANG, The University of Hong Kong, China YING-TIAN LIU, VAST, China HAO XU, Zhejiang University, China DING LIANG, VAST, China YAN-PEI CAO†, VAST, China XIHUI LIU†, The University of Hong Kong, China Fig. 1. OmniPart: Generating Complex 3D Objects as Compositions of Controllable Parts. From simple 2D images (shown framed) and mask inputs, OmniPart first plans a 3D part structure using an autoregressive model, then synthesizes all high-quality, textured parts simultaneously (individual components",
+    "authors": [
+      "YUNHAN YANG",
+      "YUFAN ZHOU",
+      "YUAN-CHEN GUO",
+      "ZI-XIN ZOU",
+      "YUKUN HUANG",
+      "YING-TIAN LIU",
+      "HAO XU",
+      "DING LIANG",
+      "YAN-PEI CAO",
+      "XIHUI LIU"
+    ],
+    "year": 2024,
+    "keywords": [
+      "3D Generation",
+      "Part-aware",
+      "Diffusion",
+      "Autoregressive Models"
+    ],
+    "file_name": "2507.06165v1.pdf",
+    "file_store": "data/papers_files/1127_f4b22fb4.pdf",
+    "language": null,
+    "source": "upload"
+  },
+  {
+    "id": 1128,
+    "source_id": null,
+    "url": null,
+    "title": "HydraPlus-Net: Attentive Deep Features for Pedestrian Analysis",
+    "abstract": "Pedestrian analysis plays a vital role in intelligent video surveillance and is a key component for security-centric computer vision systems. Despite that the convolutional neural networks are remarkable in learning discrimina- tive features from images, the learning of comprehensive features of pedestrians for ﬁne-grained tasks remains an open problem. In this study, we propose a new attention- based deep neural network, named as HydraPlus-Net (HP- net), that multi-directionally feeds the multi-level atten- tion maps to different feature layers. The attentive deep features learned from the proposed HP-net bring unique advantages: (1) the model is capable of capturing mul- tiple attentions from low-level to semantic-level, and (2) it explores the multi-scale selectiveness of attentive fea- tures to enrich the ﬁnal feature representations for a pedes- trian image. We demonstrate the effectiveness and general- ity of the proposed HP-net for pedestrian analysis on two tasks, i.e. pedestrian attribute recognition and person re- identiﬁcation. Intensive experimental results have been pro- vided to prove that the HP-net outperforms the state-of-the- art methods on various datasets.1",
+    "authors": [
+      "Xihui Liu1",
+      "2∗",
+      "Haiyu Zhao 2∗",
+      "Maoqing Tian 2",
+      "Lu Sheng 1"
+    ],
+    "year": 2017,
+    "keywords": [
+      "pedestrian",
+      "features",
+      "hp-net",
+      "hydraplus-net",
+      "attentive",
+      "analysis",
+      "deep",
+      "atten-"
+    ],
+    "file_name": "1123_e314dee9.pdf",
+    "file_store": "data/papers_files/1128_e314dee9.pdf",
+    "language": null,
+    "source": "upload"
+  },
+  {
+    "id": 1129,
+    "source_id": null,
+    "url": null,
+    "title": "图神经网络综述",
+    "abstract": "本文综述图神经网络在推荐系统与知识图谱中的应用，梳理近年代表性方法并讨论开放问题。",
+    "authors": [
+      "王小明"
+    ],
+    "year": 2023,
+    "keywords": [
+      "综述",
+      "神经网络",
+      "代表性",
+      "开放",
+      "梳理",
+      "讨论",
+      "推荐",
+      "图谱"
+    ],
+    "file_name": "zh_sample.txt",
+    "file_store": "data/papers_files/1129_9889bd81.txt",
+    "language": null,
+    "source": "upload"
+  },
+  {
+    "id": 1130,
+    "source_id": null,
+    "url": null,
+    "title": "MIG: Automatic Data Selection for Instruction Tuning by Maximizing Information Gain in Semantic Space",
+    "abstract": "Data quality and diversity are key to the construction of effective instruction-tuning datasets. With the increasing availability of open-source instruction-tuning datasets, it is advantageous to automatically select high-quality and diverse subsets from a vast amount of data. Existing methods typically prioritize instance quality and use heuristic rules to maintain diversity. However, this absence of a comprehensive view of the entire collection often leads to suboptimal results. Moreover, heuristic rules generally focus on distance or clustering within the embedding space, which fails to accurately capture the intent of complex instructions in the semantic space. To bridge this gap, we propose a unified method for quantifying the information content of datasets. This method models the semantic space by constructing a label graph and quantifies diversity based on the distribution of information within the graph. Based on such a measurement, we further introduce an efficient sampling method that selects data samples iteratively to Maximize the Information Gain (MIG) in semantic space. Experiments on various datasets and base models demonstrate that MIG consistently outperforms state-of-the-art methods. Notably, the model fine-tuned with 5% Tulu3 data sampled by MIG achieves comparable performance to the official SFT model trained on the full dataset, with improvements of +5.73% on AlpacaEval and +6.89% on Wildbench.",
+    "authors": [
+      "Yicheng Chen",
+      "Yining Li",
+      "Kai Hu",
+      "Zerun Ma",
+      "Haochen Ye",
+      "Kai Chen"
+    ],
+    "year": 2025,
+    "keywords": [
+      "instruction tuning",
+      "data selection",
+      "information gain",
+      "semantic space",
+      "label graph",
+      "diversity"
+    ],
+    "file_name": "MIG.pdf",
+    "file_store": "data/papers_files/1130_c6c2342f.pdf",
+    "language": null,
+    "source": "upload"
   }
 ]

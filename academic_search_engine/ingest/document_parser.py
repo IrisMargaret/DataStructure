@@ -27,15 +27,25 @@ def parse_file(file_path, use_ai=False):
     """拆解单个文档文件。
 
     返回:
-        dict: {"meta": {...}, "confidence": 0.0~1.0, "ai_used": bool}
+        dict: {"meta": {...}, "confidence": 0.0~1.0, "ai_used": bool,
+               "no_text": bool(可选), "no_text_reason": str(可选)}
     异常:
         PdfExtractError / ValueError / OSError：交由上层处理。
+        （PDF 无文本层等已被本函数转为 no_text 空结果，不再抛错）
     """
     path = Path(file_path)
     ext = path.suffix.lower()
 
     if ext in PDF_EXTS:
-        result = pdf_extractor.extract_pdf(str(path))
+        try:
+            result = pdf_extractor.extract_pdf(str(path))
+        except Exception as exc:
+            # 无文本层(扫描版)/加密/损坏：不再中断导入，
+            # 返回空元数据与 no_text 标记，由上层(SVC)按文件名建立占位条目；
+            # 原始异常保存在 no_text_reason 供提示使用。
+            result = {"title": "", "abstract": "", "authors": [],
+                      "year": None, "text": ""}
+            result["no_text_reason"] = str(exc)
     elif ext in TEXT_EXTS:
         raw = _read_text(path)
         result = text_parser.parse_text(raw)
@@ -67,7 +77,11 @@ def parse_file(file_path, use_ai=False):
         first = re.split(r"(?<=[。.!?])\s+", meta["abstract"].strip(), 1)[0]
         first = first.strip(" .。")
         meta["title"] = (first[0].upper() + first[1:])[:150] if first else ""
-    return {"meta": meta, "confidence": confidence, "ai_used": ai_used}
+    out = {"meta": meta, "confidence": confidence, "ai_used": ai_used}
+    if result.get("no_text_reason"):
+        out["no_text"] = True
+        out["no_text_reason"] = result["no_text_reason"]
+    return out
 
 
 def _read_text(path):

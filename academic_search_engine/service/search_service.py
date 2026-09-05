@@ -16,6 +16,7 @@
 import hashlib
 import json
 import os
+import re
 import shutil
 import tempfile
 import threading
@@ -374,27 +375,72 @@ class SearchService:
             return {**result, "ok": False}
         return {"ok": True, "paper": result}
 
+    @staticmethod
+    def _fallback_title(filename):
+        """由文件名生成可读标题（供“无法解析”时的占位条目使用）。"""
+        stem = Path(filename).stem.strip()
+        stem = re.sub(r"[\s_\-]+", " ", stem)
+        stem = re.sub(r"[^\w\u4e00-\u9fff]+", " ", stem, flags=re.UNICODE)
+        stem = re.sub(r"\s+", " ", stem).strip(" .")
+        return (stem or "未命名文献")[:150]
+
     def add_file(self, file_stream, filename, use_ai=False):
         """上传单个文档（PDF / 纯文本）并入库（原文归档 + 严格去重）。
 
         上传临时副本解析后立即清理；原文在 _add_from_meta 归档到 files_dir。
+
+        解析容错：扫描版/无文本层/加密/损坏的 PDF，以及纯文本无标题时，
+        自动按文件名建立“占位条目”并归档原文（附 note 提示），保证入库不中断；
+        用户后续可删除或用可解析版本重传、手动完善。
         """
         from ingest.document_parser import parse_file
+        from ingest.errors import friendly_parse_error
 
         data_bytes = file_stream.read()
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
         safe = f"{int(time.time())}_{Path(filename).name}"
         save_path = self.uploads_dir / safe
         save_path.write_bytes(data_bytes)
+        ext = Path(filename).suffix.lower()
         try:
-            parsed = parse_file(str(save_path), use_ai=use_ai)
+            parsed = None
+            try:
+                parsed = parse_file(str(save_path), use_ai=use_ai)
+                if not parsed["meta"]["title"]:
+                    raise ValueError(
+                        "未能识别论文标题，请改用 AI 精修或手动填写")
+            except Exception as exc:
+                can_fallback = ext == ".pdf" or (
+                    ext in (".txt", ".md", ".text")
+                    and "未能识别论文标题" in str(exc))
+                if not can_fallback:
+                    raise
+                reason = ""
+                if parsed is not None:
+                    reason = parsed.get("no_text_reason") or ""
+                if not reason:
+                    reason = (friendly_parse_error(exc) if ext == ".pdf"
+                              else "未能识别论文标题")
+                note = (reason + "。已按文件名建立条目，原文已归档，"
+                        "可删除后重传可解析版本或用 AI 精修/手动完善")
+                parsed = {
+                    "meta": {
+                        "title": self._fallback_title(filename),
+                        "abstract": "",
+                        "authors": [],
+                        "year": None,
+                        "language": None,
+                        "source": "upload",
+                    },
+                    "confidence": 0.15,
+                    "ai_used": False,
+                    "note": note,
+                }
             meta = parsed["meta"]
-            if not meta["title"]:
-                raise ValueError("未能识别论文标题，请改用 AI 精修或手动填写")
             meta.setdefault("source", "upload")
             result = self._add_from_meta(
                 meta, file_bytes=data_bytes, file_name=Path(filename).name,
-                file_ext=Path(filename).suffix.lower())
+                file_ext=ext)
             if "duplicate" in result:
                 return {**result, "ok": False}
             return {
@@ -402,6 +448,7 @@ class SearchService:
                 "paper": result,
                 "confidence": parsed["confidence"],
                 "ai_used": parsed["ai_used"],
+                **({"note": parsed["note"]} if parsed.get("note") else {}),
             }
         finally:
             # 临时解析副本用后即删（原文已在 files_dir 归档）
@@ -425,10 +472,37 @@ class SearchService:
         for entry in entries:
             try:
                 data_bytes = Path(entry.path).read_bytes()
-                parsed = parse_file(entry.path, use_ai=use_ai)
+                try:
+                    parsed = parse_file(entry.path, use_ai=use_ai)
+                    if not parsed["meta"]["title"]:
+                        raise ValueError("未能识别论文标题")
+                except Exception as exc:
+                    eext = Path(entry.name).suffix.lower()
+                    can_fallback = eext == ".pdf" or (
+                        eext in (".txt", ".md", ".text")
+                        and "未能识别论文标题" in str(exc))
+                    if not can_fallback:
+                        raise
+                    reason = ""
+                    if parsed is not None:
+                        reason = parsed.get("no_text_reason") or ""
+                    if not reason:
+                        reason = (friendly_parse_error(exc) if eext == ".pdf"
+                                  else "未能识别论文标题")
+                    parsed = {
+                        "meta": {
+                            "title": self._fallback_title(entry.name),
+                            "abstract": "",
+                            "authors": [],
+                            "year": None,
+                            "language": None,
+                            "source": "upload",
+                        },
+                        "confidence": 0.15,
+                        "ai_used": False,
+                        "note": reason + "。已按文件名建立条目",
+                    }
                 meta = parsed["meta"]
-                if not meta["title"]:
-                    raise ValueError("未能识别论文标题")
                 meta.setdefault("source", "upload")
                 result = self._add_from_meta(
                     meta, file_bytes=data_bytes, file_name=entry.name,
@@ -439,12 +513,15 @@ class SearchService:
                         **result["existing"],
                     })
                 else:
-                    added.append({
+                    item = {
                         "name": entry.name,
                         "paper_id": result["id"],
                         "title": result["title"],
                         "ai_used": parsed["ai_used"],
-                    })
+                    }
+                    if parsed.get("note"):
+                        item["note"] = parsed["note"]
+                    added.append(item)
             except Exception as exc:
                 failed.append({"name": entry.name,
                                "error": friendly_parse_error(exc)})
