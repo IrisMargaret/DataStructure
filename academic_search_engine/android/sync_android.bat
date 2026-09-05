@@ -20,6 +20,7 @@ for %%P in (core service web ingest crawler agent) do (
   )
 )
 if exist "%SRC%\logutil.py" copy /y "%SRC%\logutil.py" "%DST%\python\logutil.py" >nul
+if exist "%SRC%\paths.py" copy /y "%SRC%\paths.py" "%DST%\python\paths.py" >nul
 
 echo [2/3] 清理 __pycache__ ...
 for /d /r "%DST%\python" %%D in (__pycache__) do rd /s /q "%%D" 2>nul

@@ -22,6 +22,7 @@ import threading
 import time
 from pathlib import Path
 
+from paths import DATA_ROOT
 from core.inverted_index import InvertedIndex
 from core.keyword_extractor import KeywordExtractor
 from core.paper import Paper, paper_content_key
@@ -29,12 +30,9 @@ from core.preprocessor import Preprocessor
 from core.translator import Translator, detect_lang
 from core.trie import Trie
 
-# 项目根目录 = service 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向）
-PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
-                    or Path(__file__).resolve().parent.parent)
-PAPERS_PATH = PROJECT_ROOT / "data" / "papers.json"
-UPLOAD_DIR = PROJECT_ROOT / "uploads"
-FILES_DIR = PROJECT_ROOT / "data" / "papers_files"
+PAPERS_PATH = DATA_ROOT / "data" / "papers.json"
+UPLOAD_DIR = DATA_ROOT / "uploads"
+FILES_DIR = DATA_ROOT / "data" / "papers_files"
 
 MIN_PAPERS = 150  # 论文少于该数量时启动自动采集
 
@@ -57,6 +55,7 @@ class SearchService:
         self._index = InvertedIndex(self._preprocessor)
         self._trie = Trie()
         self._content_idx = {}   # 内容键 -> paper_id（严格去重）
+        self._terms_rows = None  # 全词条行缓存（term/display/df，df 降序）
         self._crawl = {"running": False, "total": 0, "message": ""}
         self._load_or_fetch()    # 数据不足时自动采集
 
@@ -107,6 +106,7 @@ class SearchService:
 
     def _rebuild_trie(self):
         """基于索引词条的原词映射重建 Trie（补全输入的是原词）。"""
+        self._terms_rows = None  # 索引已变化，词条缓存作废
         self._trie = Trie()
         for counter in self._index.term_display.values():
             for orig, freq in counter.items():
@@ -227,6 +227,36 @@ class SearchService:
         with self._lock:
             return self._index.index_snapshot(limit=limit)
 
+    def _term_rows(self):
+        """全部词条行（term/display/df），df 降序、同频按词条排序；惰性缓存。
+
+        唯一关键词数 = len(rows)；索引总项数 = sum(row.df)。
+        """
+        rows = self._terms_rows
+        if rows is None:
+            index = self._index
+            rows = sorted(
+                ({"term": term, "display": index.display(term),
+                  "df": len(postings)}
+                 for term, postings in index.index.items()),
+                key=lambda r: (-r["df"], r["term"].lower()))
+            self._terms_rows = rows
+        return rows
+
+    def all_terms(self, q="", page=1, size=200):
+        """全部唯一词条列表（可按原词/词干子串过滤），供统计卡展开。"""
+        with self._lock:
+            rows = self._term_rows()
+            if q:
+                needle = q.lower()
+                rows = [r for r in rows
+                        if needle in r["term"].lower()
+                        or needle in r["display"].lower()]
+            total = len(rows)
+            start = (page - 1) * size
+            items = rows[start:start + size]
+        return {"total": total, "page": page, "size": size, "terms": items}
+
     # ---------------- 文库管理 ----------------
 
     def list_papers(self, page=1, size=20, query=""):
@@ -259,7 +289,7 @@ class SearchService:
         if not file_store:
             return None
         files_root = self.files_dir.resolve()
-        candidates = [PROJECT_ROOT / file_store, self.files_dir / file_store,
+        candidates = [DATA_ROOT / file_store, self.files_dir / file_store,
                       Path(file_store)]
         for cand in candidates:
             try:
@@ -486,7 +516,7 @@ class SearchService:
         if not dest.exists():
             dest.write_bytes(data_bytes)
         try:
-            return str(dest.relative_to(PROJECT_ROOT)).replace("\\", "/")
+            return str(dest.relative_to(DATA_ROOT)).replace("\\", "/")
         except ValueError:
             return str(dest)
 

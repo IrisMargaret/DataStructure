@@ -3,14 +3,11 @@
 
 import logging
 import logging.handlers
-import os
 import threading
 from pathlib import Path
 
-# 数据根目录：默认项目目录；设置 ACADEMIC_DATA_ROOT（移动端打包）时重定向，
-# 使日志/数据全部落到 App 私有可写目录（APK 内资源目录只读）。
-PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
-                    or Path(__file__).resolve().parent)
+from paths import DATA_ROOT
+
 _lock = threading.Lock()
 _loggers = {}
 
@@ -20,7 +17,7 @@ def get_logger(name="app", path=None):
     with _lock:
         if name in _loggers:
             return _loggers[name]
-        log_file = Path(path) if path else PROJECT_ROOT / "logs" / "app.log"
+        log_file = Path(path) if path else DATA_ROOT / "logs" / "app.log"
         log_file.parent.mkdir(parents=True, exist_ok=True)
 
         logger = logging.getLogger(f"ir.{name}")

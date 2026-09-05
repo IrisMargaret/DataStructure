@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Web 路由（薄层）：只做参数解析与 JSON 化，全部业务委托 SearchService。
 
-按功能分三节：
-- 检索：/api/search /api/suggest /api/index /api/stats /api/meta
+按功能分四节：
+- 检索：/api/search /api/suggest /api/index /api/stats /api/meta /api/terms
 - 文库：/api/papers（列表/详情/新增/删除）
 - 系统：/api/crawl /api/crawl/status
+- AI 设置：/api/settings（GET/PUT/DELETE） /api/settings/test
 
 错误约定：统一返回 {"error": msg}，配合 400/404/409/502 状态码。
 """
@@ -72,6 +73,14 @@ def register_routes(app):
     @app.get("/api/meta")
     def api_meta():
         return jsonify(svc.meta())
+
+    @app.get("/api/terms")
+    def api_terms():
+        """全部唯一词条（统计卡展开用）：按 df 降序，可分页/子串过滤。"""
+        q = request.args.get("q", "").strip()
+        page = _safe_int(request.args.get("page"), 1, 1, 10 ** 6)
+        size = _safe_int(request.args.get("size"), 200, 1, 500)
+        return jsonify(svc.all_terms(q=q, page=page, size=size))
 
     # ---------------- 文库 ----------------
 
@@ -171,6 +180,72 @@ def register_routes(app):
     @app.get("/api/crawl/status")
     def api_crawl_status():
         return jsonify(svc.crawl_status())
+
+    # ---------------- AI 设置（应用内配置，见 agent/settings.py） ----------------
+
+    @app.get("/api/settings")
+    def api_settings_get():
+        """返回脱敏后的 AI 配置视图（Key 永不明文回显）。"""
+        from agent import settings as store
+        return jsonify(store.view_settings())
+
+    @app.put("/api/settings")
+    def api_settings_put():
+        """保存 AI 配置：部分字段可只改其一；api_key 传空串=清除。
+
+        校验通过后写入 data/app_settings.json 并立即注入 os.environ。
+        """
+        from agent import settings as store
+        data = request.get_json(silent=True) or {}
+        cur = store.load_settings()
+
+        def pick(field):
+            """请求中给了该字段则取（字符串去除首尾空白），否则沿用现值。"""
+            if field in data:
+                value = data[field]
+                return str(value).strip() if value is not None else ""
+            return str(cur.get(field, "")).strip() if cur.get(field) else ""
+
+        base = pick("api_base").rstrip("/")
+        key = pick("api_key")
+        model = pick("model")
+        if key and not base.startswith(("http://", "https://")):
+            return jsonify({"error": "API 地址须以 http(s):// 开头"}), 400
+        if key and not model:
+            return jsonify({"error": "请填写模型名（如 deepseek-chat）"}), 400
+        try:
+            timeout = float(data.get("timeout", cur.get("timeout", 30)))
+        except (TypeError, ValueError):
+            timeout = 30
+        try:
+            temperature = float(
+                data.get("temperature", cur.get("temperature", 0.2)))
+        except (TypeError, ValueError):
+            temperature = 0.2
+        timeout = min(max(timeout, 5), 300)
+        temperature = min(max(temperature, 0), 1.5)
+
+        settings = {"api_base": base, "api_key": key, "model": model,
+                    "timeout": timeout, "temperature": temperature}
+        store.save_settings(settings)
+        store.apply_to_env(settings)
+        return jsonify(store.view_settings(settings))
+
+    @app.delete("/api/settings")
+    def api_settings_delete():
+        """清除 AI 配置（删除本地文件并移除环境变量）。"""
+        from agent import settings as store
+        store.clear_settings()
+        store.apply_to_env({f: "" for f, _ in store.ENV_FIELDS})
+        return jsonify({"ok": True})
+
+    @app.post("/api/settings/test")
+    def api_settings_test():
+        """用请求体配置（可临时覆盖、不落盘）做一次最小连通测试。"""
+        from agent import llm
+        data = request.get_json(silent=True) or {}
+        ok, message = llm.test_connection(data)
+        return jsonify({"ok": ok, "message": message})
 
     # ---------------- 统一错误处理 ----------------
 

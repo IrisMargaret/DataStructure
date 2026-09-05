@@ -120,7 +120,7 @@ public class MainActivity extends Activity {
     // ---------------- Asset unpacking ----------------
 
     /** Bump when the unpack layout changes so stale/legacy data is refreshed. */
-    private static final String UNPACK_MARKER = ".unpacked-v2";
+    private static final String UNPACK_MARKER = ".unpacked-v3";
 
     /**
      * Unpack assets/academic to private dir.
@@ -293,6 +293,13 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(true);
         // support target=_blank: new windows are bridged, see onCreateWindow
         s.setSupportMultipleWindows(true);
+        // 响应式页面：以视口宽度渲染，禁用缩放/文本自动放大，
+        // 避免不同机型 WebView 自动缩放破坏布局
+        s.setUseWideViewPort(false);
+        s.setLoadWithOverviewMode(false);
+        s.setSupportZoom(false);
+        s.setBuiltInZoomControls(false);
+        s.setTextZoom(100);
 
         WebViewClient client = new WebViewClient() {
             @Override

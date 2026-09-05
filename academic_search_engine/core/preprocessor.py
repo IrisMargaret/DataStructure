@@ -13,18 +13,14 @@
 以保证“词干化前后一致”，映射不会错位。
 """
 
-import os
 import re
-from pathlib import Path
 
 import jieba
 
+from paths import DATA_ROOT
 from .stemmer import PorterStemmer
 
-# 项目根目录 = core 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向）
-PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
-                    or Path(__file__).resolve().parent.parent)
-STOPWORDS_PATH = PROJECT_ROOT / "data" / "stopwords.txt"
+STOPWORDS_PATH = DATA_ROOT / "data" / "stopwords.txt"
 
 # 匹配一段连续中文，或一个拉丁单词（含连字符/下划线）
 _TOKEN_SPLIT_RE = re.compile(r"[\u4e00-\u9fff]+|[A-Za-z][A-Za-z0-9\-_]*")

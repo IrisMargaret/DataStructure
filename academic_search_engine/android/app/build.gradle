@@ -11,8 +11,8 @@ android {
         applicationId "com.academic.search"
         minSdk 24
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
 
         ndk {
             // Chaquopy 17 + Python 3.12 仅提供 arm64-v8a / x86_64 运行时
@@ -20,16 +20,28 @@ android {
         }
 
         python {
-            // 本机构建解释器（Python 3.12，与 Chaquopy 17 支持范围一致）
-            buildPython "C:/Users/marym/AppData/Local/Programs/Python/Python312/python.exe"
+            // 构建期解释器（Python 3.12，与 Chaquopy 17 支持范围一致）：
+            // 优先 local.properties 的 python.executable（build_apk 脚本自动写入），
+            // 其次环境变量 ACADEMIC_PYTHON，最后回退默认路径。
+            def lp = new Properties()
+            def lpFile = rootProject.file("local.properties")
+            if (lpFile.exists()) {
+                lpFile.withInputStream { lp.load(it) }
+            }
+            def pyExec = lp.getProperty("python.executable")
+                    ?: System.getenv("ACADEMIC_PYTHON")
+                    ?: (System.getenv("LOCALAPPDATA") + "/Programs/Python/Python312/python.exe")
+            buildPython pyExec
             version "3.12"
             pip {
                 // --no-cache-dir：规避 pip 本地 HTTP 缓存 304 重验证死锁；
                 // 超时/重试加大：pypi.org 网络波动时仍可完成下载；
                 // --find-links：jieba 在 PyPI 只有 sdist，而 Chaquopy pip
                 //   强制 --only-binary，故用本地预构建的 py3-none-any wheel
+                //   （缺失时由 build_apk 脚本现场生成到 local-wheels/）
+                def wheelDir = new File(rootProject.projectDir, "local-wheels").absolutePath.replace("\\", "/")
                 options "--no-cache-dir", "--timeout", "60", "--retries", "20",
-                        "--find-links", "C:/DataStructure/academic_search_engine/android/local-wheels"
+                        "--find-links", wheelDir
                 install "flask"
                 install "flask-cors"
                 install "python-dotenv"

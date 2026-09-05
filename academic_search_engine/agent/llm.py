@@ -71,3 +71,56 @@ def _parse_json(content):
         return json.loads(candidate)
     except json.JSONDecodeError:
         return None
+
+
+def test_connection(cfg=None):
+    """用给定配置（缺省取当前环境）发一次最小 chat 请求，用于「设置-测试连接」。
+
+    返回 (ok, message)；message 为面向用户的中文提示，不含 Key 与请求体。
+    """
+    base = ((cfg or {}).get("api_base") or os.getenv("LLM_API_BASE", "")) \
+        .strip().rstrip("/")
+    key = ((cfg or {}).get("api_key") or os.getenv("LLM_API_KEY", "")).strip()
+    model = ((cfg or {}).get("model") or os.getenv("LLM_MODEL", "")).strip()
+    if not base or not key or not model:
+        return False, "请先填写 API 地址、Key 与模型名"
+    try:
+        timeout = float((cfg or {}).get("timeout")
+                        or os.getenv("LLM_TIMEOUT", "30"))
+    except (TypeError, ValueError):
+        timeout = 30.0
+    url = base + "/chat/completions"
+    payload = {
+        "model": model,
+        "temperature": 0,
+        "max_tokens": 8,
+        "messages": [{"role": "user", "content": "ping"}],
+    }
+    headers = {"Authorization": "Bearer " + key}
+    try:
+        resp = requests.post(url, json=payload, headers=headers,
+                             timeout=timeout)
+    except requests.exceptions.Timeout:
+        return False, "连接超时：请检查 API 地址与网络"
+    except requests.exceptions.ConnectionError:
+        return False, "无法连接服务器：请检查 API 地址（需含 /v1 等路径）与网络"
+    except requests.exceptions.RequestException as exc:
+        return False, "请求失败：" + exc.__class__.__name__
+
+    if resp.status_code == 200:
+        return True, "连接成功"
+    if resp.status_code == 401:
+        return False, "API Key 无效或未授权（401）"
+    if resp.status_code in (400, 404):
+        hint = ""
+        try:
+            body = resp.json()
+            hint = (body.get("error", {}).get("message") or "")[:140]
+        except Exception:
+            pass
+        tail = hint if hint else "：请检查模型名与地址路径"
+        return False, "请求被拒绝（" + str(resp.status_code) + "）" + tail
+    if resp.status_code >= 500:
+        return False, "服务端错误（" + str(resp.status_code) + "），请稍后重试或核对模型名"
+    return False, "未知响应（" + str(resp.status_code) + "）"
+

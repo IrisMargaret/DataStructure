@@ -1,6 +1,8 @@
-﻿# Android build artifacts & local config (kept out of the public repo)
-.gradle-home/
+# ===== Android 工程忽略 =====
+
+# Android 构建产物与本地配置
 .gradle/
+.gradle-home/
 build/
 app/build/
 local.properties
@@ -8,3 +10,20 @@ local.properties
 *.iml
 build_log*.txt
 *.apk
+app/debug.keystore
+local-wheels/*.whl
+
+# 同步产物（由 sync_android.ps1 从项目根生成，勿手改 / 勿提交）
+app/src/main/assets/
+app/src/main/python/core/
+app/src/main/python/service/
+app/src/main/python/web/
+app/src/main/python/ingest/
+app/src/main/python/crawler/
+app/src/main/python/agent/
+app/src/main/python/logutil.py
+app/src/main/python/paths.py
+app/src/main/python/__pycache__/
+
+# mobile_server.py 是 python 目录中唯一需入库的源文件
+!app/src/main/python/mobile_server.py

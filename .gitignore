@@ -1,5 +1,37 @@
-﻿# Build/test residue at repo root (sandbox-generated temp dirs)
+# ===== 学术论文检索 · 仓库级忽略 =====
+
+# IDE
+.idea/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# 本地缓存/构建（保留在磁盘、不上传）
 .build-tmp/
 buildtmp/
 .gradle-home/
-android-wheels/
+.pip-tmp/
+*.log
+
+# 密钥与本地配置（绝不提交）
+.env
+*.keystore
+
+# 运行期/本地数据
+academic_search_engine/data/app_settings.json
+academic_search_engine/uploads/
+academic_search_engine/data/papers_files/
+
+# 桌面打包产物与构建缓存
+desktop/.build-venv/
+desktop/build/
+desktop/dist/
+
+# 可再生物件（脚本/构建会自动生成）
+*.apk
+*.whl
+
+.DS_Store

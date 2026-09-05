@@ -18,6 +18,7 @@ foreach ($pkg in @('core','service','web','ingest','crawler','agent')) {
     } else { Write-Warning "missing package: $pkg" }
 }
 Copy-Item (Join-Path $src 'logutil.py') (Join-Path $dstPython 'logutil.py') -Force
+Copy-Item (Join-Path $src 'paths.py') (Join-Path $dstPython 'paths.py') -Force
 
 Write-Host '[2/3] removing __pycache__'
 Get-ChildItem $dstPython -Recurse -Directory -Filter '__pycache__' |

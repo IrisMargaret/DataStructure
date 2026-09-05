@@ -8,18 +8,24 @@ create_app()：
 """
 
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
+from paths import DATA_ROOT, RESOURCE_ROOT
 from .routes import register_routes
 
-# 项目根目录 = web 包的上层目录（移动端可经 ACADEMIC_DATA_ROOT 重定向，
-# 使模板/静态资源/数据目录指向 App 私有解包目录）
-PROJECT_ROOT = Path(os.environ.get("ACADEMIC_DATA_ROOT")
-                    or Path(__file__).resolve().parent.parent)
+
+def _load_env():
+    """加载 .env：数据根优先，其次资源根（同一目录时只加载一次）。
+
+    注意：AI 配置的最终权威是应用内「设置」页（agent/settings.py），
+    其会在本函数之后把 app_settings.json 覆盖到 os.environ。
+    """
+    load_dotenv(DATA_ROOT / ".env")
+    if RESOURCE_ROOT != DATA_ROOT:
+        load_dotenv(RESOURCE_ROOT / ".env")
 
 
 def create_app(service=None, auto_fetch=True):
@@ -27,17 +33,19 @@ def create_app(service=None, auto_fetch=True):
 
     service 可注入（测试用）；auto_fetch=False 时跳过“数据不足自动爬取”。
     """
-    load_dotenv(PROJECT_ROOT / ".env")
+    _load_env()
 
     app = Flask(
         __name__,
-        template_folder=str(PROJECT_ROOT / "templates"),
-        static_folder=str(PROJECT_ROOT / "static"),
+        template_folder=str(RESOURCE_ROOT / "templates"),
+        static_folder=str(RESOURCE_ROOT / "static"),
     )
     app.json.ensure_ascii = False  # 中文以 UTF-8 输出
     CORS(app)
 
     if service is None:
+        from agent import settings as settings_store
+        settings_store.apply_to_env()  # 设置页配置优先于 .env（见 agent/settings.py）
         from service.search_service import SearchService
         service = SearchService(auto_fetch=auto_fetch)
     app.config["SERVICE"] = service

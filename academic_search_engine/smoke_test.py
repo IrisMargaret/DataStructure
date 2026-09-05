@@ -623,6 +623,110 @@ def test_topk_and_hygiene():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+# ==================== H. AI 设置接口 / 全词条列表 ====================
+
+def test_settings_and_terms():
+    print("== H. AI 设置接口 / 全词条列表（隔离目录）==")
+    import os as _os
+    from agent import settings as store
+    from service.search_service import SearchService
+    from web import create_app
+
+    env_keys = ["LLM_API_BASE", "LLM_API_KEY", "LLM_MODEL"]
+    saved_env = {k: _os.environ.get(k) for k in env_keys}
+    for k in env_keys:
+        _os.environ[k] = ""
+    tmp = Path(tempfile.mkdtemp(prefix="ir_settings_"))
+    saved_path = store.SETTINGS_PATH
+    try:
+        store.SETTINGS_PATH = tmp / "data" / "app_settings.json"  # 隔离落盘
+        pp = tmp / "papers.json"
+        pp.write_text(json.dumps([
+            {"id": 0, "title": "Attention Is All You Need",
+             "abstract": "The dominant sequence transduction models are based "
+                         "on attention mechanisms.",
+             "authors": ["Vaswani"], "year": 2017, "language": "en"},
+            {"id": 1, "title": "卷积神经网络图像分类研究",
+             "abstract": "本文研究卷积神经网络，使用卷积层进行图像分类。",
+             "authors": ["王五"], "year": 2021, "language": "zh"},
+        ], ensure_ascii=False), encoding="utf-8")
+        svc = SearchService(auto_fetch=False, papers_path=pp,
+                            files_dir=tmp / "files",
+                            uploads_dir=tmp / "uploads")
+        app = create_app(service=svc)
+        c = app.test_client()
+
+        # H1. 初始未配置（脱敏为空）
+        v = c.get("/api/settings").get_json()
+        check("H1 初始未配置", v["configured"] is False
+              and v["api_key_masked"] == "")
+
+        # H2. PUT 保存 -> 脱敏回显（无明文）+ env 即时生效 + 文件落盘
+        resp = c.put("/api/settings", json={
+            "api_base": "https://api.example.com/v1",
+            "api_key": "sk-abcdef123456", "model": "demo-model"})
+        v = resp.get_json()
+        check("H2 保存脱敏", resp.status_code == 200 and v["configured"]
+              and v["api_key_masked"].endswith("3456")
+              and "abcdef123456" not in v["api_key_masked"])
+        check("H2b env 即时生效",
+              _os.environ.get("LLM_API_KEY") == "sk-abcdef123456"
+              and _os.environ.get("LLM_MODEL") == "demo-model")
+        check("H2c 文件落盘", (tmp / "data" / "app_settings.json").exists())
+
+        # H3. 重启持久化：直接读文件重建视图
+        v2 = store.view_settings(store.load_settings())
+        check("H3 重启持久化", v2["model"] == "demo-model" and v2["configured"])
+
+        # H4. 部分更新（只改模型，Key 保留）
+        v3 = c.put("/api/settings", json={"model": "demo-2"}).get_json()
+        check("H4 部分更新", v3["model"] == "demo-2" and v3["configured"]
+              and v3["api_key_masked"].endswith("3456"))
+
+        # H5. 非法地址 / 缺模型 -> 400
+        check("H5 非法地址",
+              c.put("/api/settings", json={"api_base": "ftp://x",
+                                           "api_key": "k"}).status_code == 400)
+
+        # H6. 测试连接（本地拒连端口 -> 中文可读错误，不抛异常）
+        t = c.post("/api/settings/test", json={
+            "api_base": "http://127.0.0.1:9/v1", "api_key": "k",
+            "model": "m", "timeout": 3}).get_json()
+        check("H6 连接错误文案", t["ok"] is False and t["message"])
+
+        # H7. 清除 -> 文件删除 + env 移除
+        d = c.delete("/api/settings").get_json()
+        check("H7 清除配置", d["ok"]
+              and not (tmp / "data" / "app_settings.json").exists()
+              and not _os.environ.get("LLM_API_KEY"))
+
+        # H8. terms：分页 + df 降序 + 子串过滤
+        t1 = c.get("/api/terms?size=10").get_json()
+        check("H8 terms 分页降序", t1["total"] >= 10
+              and len(t1["terms"]) == 10
+              and t1["terms"][0]["df"] >= t1["terms"][-1]["df"])
+        t2 = c.get("/api/terms?q=attention").get_json()
+        check("H8b terms 过滤", any("attent" in x["term"] for x in t2["terms"]))
+
+        # H9. 全量取回与 stats 对齐：行数=唯一词条数，Σdf=索引总项数
+        rows, page = [], 1
+        while True:
+            rp = c.get(f"/api/terms?page={page}&size=500").get_json()
+            rows += rp["terms"]
+            if page * 500 >= rp["total"]:
+                break
+            page += 1
+        s = svc.stats()
+        check("H9 词条数与总项数一致",
+              len(rows) == s["unique_terms"]
+              and sum(x["df"] for x in rows) == s["total_postings"])
+    finally:
+        store.SETTINGS_PATH = saved_path
+        for k in env_keys:
+            _os.environ[k] = saved_env.get(k) or ""
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("=" * 62)
     test_core()
@@ -632,5 +736,6 @@ if __name__ == "__main__":
     test_zh_ingest_and_dedupe()
     test_quality_fixes()
     test_topk_and_hygiene()
+    test_settings_and_terms()
     print("=" * 62)
     print(f"全部通过：{len(PASS)} 项检查")

@@ -1,331 +1,348 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>学术论文关键词索引与检索系统</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b94f22">
+<title>论文检索 · 学术论文关键词索引与检索系统</title>
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<div class="layout">
 
-  <!-- ================= 侧栏导航 ================= -->
-  <aside class="rail">
-    <div class="brand">
-      <div class="overline">数据结构课程设计 · 论文检索</div>
-      <div class="wordmark">论文索引与检索</div>
-    </div>
+<!-- ============ 顶栏 ============ -->
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        <circle cx="15.5" cy="9.5" r="3.4"/>
+        <path d="M13.8 12.2 12 14"/>
+      </svg>
+    </span>
+    <span class="word">论文检索</span>
+  </div>
+</header>
+
+<div class="app-body">
+  <!-- ============ 主导航（竖屏=底部 / 横屏窄高=顶部 / 宽屏=左侧） ============ -->
+  <nav class="nav" aria-label="主导航">
     <button class="nav-item active" data-view="search">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <span>索引检索</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/></svg>
+      <span>检索</span>
     </button>
     <button class="nav-item" data-view="library">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>论文文库</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>文库</span>
     </button>
     <button class="nav-item" data-view="structure">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M10.5 6.5h3.5M6.5 10.5v3.5M17.5 10.5v3.5M14 17.5h-3.5" opacity=".6"/></svg>
-      <span>结构说明</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M10.5 6.5h3.5M6.5 10.5v3.5M17.5 10.5v3.5M14 17.5h-3.5" opacity=".55"/></svg>
+      <span>结构</span>
     </button>
-    <div class="nav-foot">
-      倒排索引 · Trie 树 · 布尔解析 · TF-IDF · 词干提取 —— 核心算法均为手写实现
-    </div>
-  </aside>
+    <button class="nav-item" data-view="settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.98 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.98a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09c0 .68.4 1.3 1.03 1.56a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.63.88 1.03 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z" opacity=".9"/></svg>
+      <span>AI 设置</span>
+    </button>
+  </nav>
 
-  <!-- ================= 主内容区 ================= -->
+  <!-- ============ 主内容 ============ -->
   <main class="main">
 
-    <!-- ---------- 视图一：索引检索 ---------- -->
+    <!-- ---------- 视图：检索 ---------- -->
     <section id="view-search" class="page">
       <div class="page-head">
-        <div class="overline">Index · Search</div>
-        <h2>关键词索引检索</h2>
-        <p>多关键词 AND 检索、布尔表达式、短语匹配与 TF/TF-IDF 相关性排序；
-           每次查询附「检索剖析」，展示倒排列表长度、最短优先归并顺序与布尔语法树。</p>
+        <h2>索引检索</h2>
+        <p>多关键词 AND、布尔表达式、短语匹配；可切换「词频 / TF-IDF」相关度排序。</p>
       </div>
 
-      <div class="stat-strip">
+      <div class="stat-strip" role="group" aria-label="索引统计">
         <div class="stat"><span class="num" id="stat-papers">–</span><span class="lbl">论文总数</span></div>
-        <div class="stat"><span class="num" id="stat-terms">–</span><span class="lbl">唯一关键词</span></div>
-        <div class="stat"><span class="num" id="stat-postings">–</span><span class="lbl">索引总项数</span></div>
+        <button type="button" class="stat stat-link" id="stat-terms" data-terms="unique"
+                title="点击查看全部唯一关键词">
+          <span class="num" id="stat-terms-num">–</span><span class="lbl">唯一关键词</span>
+          <span class="chev" aria-hidden="true">▾</span>
+        </button>
+        <button type="button" class="stat stat-link" id="stat-postings" data-terms="postings"
+                title="点击查看每个词条命中的论文数（合计=索引总项数）">
+          <span class="num" id="stat-postings-num">–</span><span class="lbl">索引总项数</span>
+          <span class="chev" aria-hidden="true">▾</span>
+        </button>
       </div>
 
       <div class="card search-card">
         <div class="search-row">
           <div class="search-main">
-            <input id="q" class="input" type="text" autocomplete="off" spellcheck="false"
-                   placeholder="输入关键词，如 graph neural network；也支持布尔表达式与引号短语">
+            <span class="s-icon" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/></svg>
+            </span>
+            <input id="q" class="input" type="search" autocomplete="off" spellcheck="false"
+                   placeholder="输入关键词，如 transformer attention"
+                   aria-label="检索关键词">
             <ul id="suggest" class="suggest hidden"></ul>
           </div>
-          <div class="seg" id="mode-seg">
-            <button data-mode="tf" class="active" title="按词频求和降序">词频 TF</button>
-            <button data-mode="tfidf" title="按 TF×IDF 加权求和降序">TF-IDF</button>
+        </div>
+        <div class="search-tools">
+          <div class="seg" id="mode-seg" role="group" aria-label="排序方式">
+            <button data-mode="tf" class="active" title="按词频求和降序">词频</button>
+            <button data-mode="tfidf" title="按 TF×IDF 加权降序">TF-IDF</button>
           </div>
-          <button id="cross-toggle" class="btn" title="中英互译检索：中文词自动扩展英文同义词；英文查询需开启后才会匹配中文文献">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h7M7.5 3v4M13 3l7 7M20 3l-7 7M4 15h7M7.5 13v4M4 21h10"/></svg>
+          <button id="cross-toggle" class="btn" title="中英互译检索：中文词自动扩展英文同义词命中英文文献">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 5h7M7.5 3v4M13 3l7 7M20 3l-7 7M4 15h7M7.5 13v4M4 21h10"/></svg>
             中英互译
           </button>
-          <button id="btn-search" class="btn btn-accent">检 索</button>
+          <button id="btn-search" class="btn btn-p">
+            检索
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
         </div>
-        <div class="search-hint">
-          示例：<code>transformer attention</code>（多词 AND）·
-          <code>graph AND (neural OR network) NOT survey</code>（布尔）·
-          <code>"large language model"</code>（短语位置匹配）· <code>神经网络</code>（中文）
-        </div>
+        <details class="hint-box">
+          <summary>语法示例</summary>
+          <div class="hint-body">
+            <code>transformer attention</code><span>多词 AND（全部命中）</span>
+            <code>graph AND (neural OR network) NOT survey</code><span>布尔表达式</span>
+            <code>"large language model"</code><span>引号短语（相邻位置匹配）</span>
+            <code>神经网络</code><span>中文检索；开启「中英互译」可命中中英文文献</span>
+          </div>
+        </details>
       </div>
 
       <div id="results-meta" class="results-meta hidden"></div>
-      <div id="results" class="hidden">
-        <div class="results-list" id="results-list"></div>
-      </div>
+      <div id="results" class="hidden"><div class="results-list" id="results-list"></div></div>
       <div id="trace-box" class="hidden"></div>
-      <div id="empty" class="empty hidden">
-        <div class="glyph">检索</div>
-        <p style="margin-top:6px">输入关键词开始检索，未命中时展示剖析原因</p>
-      </div>
+      <div id="empty" class="empty hidden"><div class="glyph">⌕</div><p>输入关键词开始检索</p></div>
     </section>
 
-    <!-- ---------- 视图二：论文文库 ---------- -->
+    <!-- ---------- 视图：文库 ---------- -->
     <section id="view-library" class="page hidden">
       <div class="page-head">
-        <div class="overline">Corpus · Library</div>
-        <h2>论文文库与动态入库</h2>
-        <p>上传 PDF / 纯文本 / ZIP 压缩包，或按 arXiv URL 抓取，自动拆解标题、摘要、作者、年份与关键词，
-           并增量更新倒排索引——上传后立即可被检索。</p>
+        <h2>论文文库</h2>
+        <p>浏览与检索已收录论文；支持上传 PDF / TXT / ZIP 和按 arXiv 链接抓取入库，入库后立即可检索。</p>
       </div>
 
-      <div class="stat-strip">
+      <div class="stat-strip" role="group" aria-label="文库统计">
         <div class="stat"><span class="num" id="lib-papers">–</span><span class="lbl">论文总数</span></div>
-        <div class="stat"><span class="num" id="lib-ai" title="是否已配置大模型拆解 Agent">–</span><span class="lbl">AI 拆解</span></div>
-        <div class="stat"><span class="num" id="crawl-state" style="font-size:15px">待机</span><span class="lbl">arXiv 爬虫</span></div>
+        <div class="stat" id="lib-ai-stat"><span class="num" id="lib-ai">–</span><span class="lbl">AI 拆解</span></div>
+        <div class="stat"><span class="num stat-state" id="crawl-state">待机</span><span class="lbl">数据采集</span></div>
       </div>
 
       <div class="card">
-        <h3>动态添加论文</h3>
-        <div class="tabs">
-          <button class="active" data-tab="tab-file">上传 PDF / TXT</button>
-          <button data-tab="tab-zip">上传 ZIP 压缩包</button>
-          <button data-tab="tab-url">arXiv URL</button>
+        <h3>添加论文</h3>
+        <div class="tabs" role="tablist">
+          <button class="active" data-tab="tab-file">PDF / TXT</button>
+          <button data-tab="tab-zip">ZIP</button>
+          <button data-tab="tab-url">arXiv 链接</button>
           <button data-tab="tab-manual">手动填写</button>
         </div>
 
         <div class="tabpane active" id="tab-file">
           <label class="file-drop">
             <input type="file" id="file-single" accept=".pdf,.txt,.md">
-            <span class="fname" id="file-single-name">点击选择 PDF 或纯文本论文（自动拆解）</span>
+            <span class="fname" id="file-single-name">选择 PDF / TXT 论文文件</span>
           </label>
-          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-            <label class="check"><input type="checkbox" id="ai-single"> 使用大模型 Agent 精修（已配置 .env 时默认开启；取消勾选则纯规则拆解）</label>
-            <button id="btn-file" class="btn btn-accent" disabled>解析并入库</button>
+          <label class="check"><input type="checkbox" id="ai-single" disabled>
+            AI 精修元数据（需先在「AI 设置」配置；未配置则用规则拆解）</label>
+          <div class="pane-actions">
+            <button id="btn-file" class="btn btn-p" disabled>解析入库</button>
           </div>
         </div>
 
         <div class="tabpane" id="tab-zip">
           <label class="file-drop">
             <input type="file" id="file-zip" accept=".zip">
-            <span class="fname" id="file-zip-name">点击选择 ZIP（含多篇 PDF / TXT）</span>
+            <span class="fname" id="file-zip-name">选择含多篇论文的 ZIP</span>
           </label>
-          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-            <label class="check"><input type="checkbox" id="ai-zip"> 使用大模型 Agent 精修（逐文件；取消勾选则纯规则拆解）</label>
-            <button id="btn-zip" class="btn btn-accent" disabled>解包并批量入库</button>
+          <label class="check"><input type="checkbox" id="ai-zip" disabled>
+            AI 精修元数据（逐文件；未配置则用规则拆解）</label>
+          <div class="pane-actions">
+            <button id="btn-zip" class="btn btn-p" disabled>解包入库</button>
           </div>
         </div>
 
         <div class="tabpane" id="tab-url">
-          <div class="field">
-            <label>arXiv 论文 URL 或编号</label>
-            <input id="url-input" class="input" placeholder="https://arxiv.org/abs/1706.03762">
-          </div>
-          <button id="btn-url" class="btn btn-accent">抓取并入库</button>
+          <div class="field"><label>arXiv 论文链接或编号</label>
+            <input id="url-input" class="input" placeholder="https://arxiv.org/abs/1706.03762"></div>
+          <div class="pane-actions"><button id="btn-url" class="btn btn-p">抓取入库</button></div>
         </div>
 
         <div class="tabpane" id="tab-manual">
           <div class="field"><label>标题 *</label><input id="m-title" class="input"></div>
-          <div class="field"><label>作者（逗号分隔）</label><input id="m-authors" class="input"></div>
-          <div class="field"><label>年份</label><input id="m-year" class="input" type="number" min="1900" max="2100"></div>
+          <div class="form-row">
+            <div class="field"><label>作者（逗号分隔）</label><input id="m-authors" class="input"></div>
+            <div class="field w-sm"><label>年份</label><input id="m-year" class="input" type="number" min="1900" max="2100" placeholder="如 2024"></div>
+          </div>
           <div class="field"><label>摘要</label><textarea id="m-abstract" class="textarea"></textarea></div>
-          <button id="btn-manual" class="btn btn-accent">添加论文</button>
+          <div class="pane-actions"><button id="btn-manual" class="btn btn-p">添加论文</button></div>
         </div>
 
         <div id="report" class="report hidden"></div>
       </div>
 
-      <div class="card" style="margin-top:16px">
-        <div class="toolbar">
-          <h3 style="margin:0;font-size:16px">文库列表</h3>
-          <input id="lib-filter" class="input" placeholder="按标题 / 作者 / 摘要过滤">
-          <button id="btn-refresh" class="btn btn-sm">刷新</button>
-          <select id="crawl-source" class="input" style="width:auto;max-width:none;padding:6px 10px">
+      <div class="card lib-card">
+        <div class="lib-bar">
+          <h3 style="margin:0">已收录论文</h3>
+          <input id="lib-filter" class="input" placeholder="搜索标题 / 作者 / 摘要…">
+        </div>
+        <div id="lib-list"><p class="hint">加载中…</p></div>
+        <div class="pager">
+          <span id="lib-total" class="hint" style="margin:0"></span>
+          <div class="page-jump">
+            <button id="page-prev" class="btn btn-sm">上一页</button>
+            <span id="lib-page">1</span>
+            <button id="page-next" class="btn btn-sm">下一页</button>
+            <span>跳至</span>
+            <input id="page-input" class="input" type="number" min="1" value="1" inputmode="numeric">
+            <button id="btn-goto" class="btn btn-sm">跳转</button>
+          </div>
+        </div>
+        <div class="lib-foot">
+          <select id="crawl-source" class="input">
             <option value="arxiv">arXiv</option>
-            <option value="openalex">OpenAlex（含中文文献）</option>
+            <option value="openalex">OpenAlex（含中文）</option>
             <option value="all">全部源</option>
           </select>
           <button id="btn-crawl" class="btn btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
-            爬取数据
+            开始采集
           </button>
         </div>
-        <div id="lib-list"><p class="hint">加载中…</p></div>
-        <div class="pager">
-          <span id="lib-total"></span>
-          <div class="g page-jump">
-            <button id="page-prev" class="btn btn-sm">上一页</button>
-            <span id="lib-page" style="align-self:center">1</span>
-            <button id="page-next" class="btn btn-sm">下一页</button>
-            <span style="align-self:center">跳至</span>
-            <input id="page-input" class="input" type="number" min="1" value="1" style="width:64px;padding:5px 8px">
-            <button id="btn-goto" class="btn btn-sm">跳转</button>
-          </div>
-        </div>
       </div>
     </section>
 
-    <!-- ---------- 视图三：结构说明 ---------- -->
+    <!-- ---------- 视图：结构说明 ---------- -->
     <section id="view-structure" class="page hidden">
       <div class="page-head">
-        <div class="overline">Architecture · Data Structures</div>
-        <h2>系统结构与数据结构说明</h2>
-        <p>主模块 / 子模块层次、对外接口契约，以及倒排索引、Trie 树、布尔解析、TF-IDF、
-           词干提取等课程考察点的设计与复杂度说明。</p>
+        <h2>结构与说明</h2>
+        <p>系统架构、核心数据结构与算法、接口与扩展方式。</p>
       </div>
 
       <div class="card">
-        <h3>一、模块层次与职责</h3>
-        <ul class="modules">
-          <li>
-            <div class="mod-name">① 核心算法层 core/ <span class="mod-desc" style="font-weight:400">—— 纯手写，无第三方依赖</span></div>
-            <div class="files">
-              子模块：<code>paper.py</code> 论文实体/内容键 ·
-              <code>preprocessor.py</code> 中英分词/停用词/词干 ·
-              <code>stemmer.py</code> Porter 词干提取 ·
-              <code>inverted_index.py</code> 倒排索引/归并检索/TF-IDF ·
-              <code>trie.py</code> 前缀补全 ·
-              <code>query_parser.py</code> 递归下降布尔解析 ·
-              <code>translator.py</code> 中英互译词典 ·
-              <code>keyword_extractor.py</code> 关键词提取
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">② 文档解析入库 ingest/</div>
-            <div class="files">
-              子模块：<code>pdf_extractor.py</code> PDF 文本/元数据 ·
-              <code>text_parser.py</code> 纯文本拆解（中英版式） ·
-              <code>document_parser.py</code> 统一拆解流水线 ·
-              <code>zip_importer.py</code> ZIP 批量（防穿越） ·
-              <code>encodings.py</code> 编码探测/乱码还原 ·
-              <code>clean_text.py</code> 噪声过滤
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">③ 数据采集 crawler/</div>
-            <div class="files">
-              子模块：<code>registry.py</code> 源注册表 + 跨源内容去重 ·
-              <code>arxiv_crawler.py</code> arXiv 源 ·
-              <code>openalex_crawler.py</code> OpenAlex 源（含 language:zh 中文文献）
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">④ 拆解 Agent agent/ <span class="mod-desc" style="font-weight:400">—— 可选，配置见 .env</span></div>
-            <div class="files">
-              子模块：<code>llm.py</code> OpenAI 兼容客户端 ·
-              <code>prompts.py</code> 提示词与输出契约 ·
-              <code>paper_agent.py</code> 元数据精修与回退
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">⑤ 检索服务门面 service/</div>
-            <div class="files">
-              子模块：<code>search_service.py</code> 组合根对象：线程安全、原子持久化、统一入库流水线
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">⑥ Web 接口层 web/ + templates/ + static/</div>
-            <div class="files">
-              子模块：<code>__init__.py</code> 应用工厂 ·
-              <code>routes.py</code> 薄路由 ·
-              <code>index.html / style.css / app.js</code> 前端三视图
-            </div>
-          </li>
-          <li>
-            <div class="mod-name">⑦ 数据存储 data/</div>
-            <div class="files">
-              <code>papers.json</code> 论文元数据（keywords/file/language/source）·
-              <code>stopwords.txt</code> 停用词 ·
-              <code>bilingual.json</code> 中英互译词典 ·
-              <code>papers_files/</code> 上传原文归档（运行时生成）
-            </div>
-          </li>
-        </ul>
+        <h3>系统架构</h3>
+        <ol class="arch">
+          <li><b>web/</b> <span>Flask 薄路由层（JSON API）</span></li>
+          <li><b>service/</b> <span>检索服务门面：组合算法与数据，线程安全，唯一入口</span></li>
+          <li><b>core/</b> <span>核心算法：倒排索引 · Trie · 布尔解析 · TF-IDF · 词干 · 互译词典 · 关键词提取</span></li>
+          <li><b>ingest/</b> <span>文档入库：PDF/纯文本/ZIP 拆解、编码修复、去噪</span></li>
+          <li><b>crawler/</b> <span>数据采集：arXiv / OpenAlex，跨源去重</span></li>
+          <li><b>agent/</b> <span>AI 精修（可选）：OpenAI 兼容接口，失败自动回退规则拆解</span></li>
+        </ol>
+        <p class="hint">依赖方向：web → service → core / ingest / crawler / agent；算法层全部手写无第三方依赖。</p>
       </div>
 
       <div class="card">
-        <h3>二、核心接口契约</h3>
+        <h3>数据结构与算法</h3>
+        <dl class="algo">
+          <div><dt>倒排索引 Inverted Index</dt>
+            <dd>词干 → 倒排表 <code>Posting(论文ID, 词频, 位置列表)</code>；变体合并（transformer/transformers → transform）。</dd>
+          </div>
+          <div><dt>多词 AND 归并</dt>
+            <dd>按倒排表长度升序，双指针两两求交，整体线性 O(n)。</dd>
+          </div>
+          <div><dt>Trie 前缀树</dt>
+            <dd>输入前缀 → DFS 收集完整词，按词频返回 Top 10；未命中自动子串包含兜底。</dd>
+          </div>
+          <div><dt>布尔查询（递归下降）</dt>
+            <dd>AND / OR / NOT / 括号 / 引号短语；AND→交集、OR→并集、NOT→全集差集。</dd>
+          </div>
+          <div><dt>TF-IDF 相关度</dt>
+            <dd>score = Σ tf(t,d) × idf(t)，idf(t) = ln((N+1)/(df+1)) + 1。</dd>
+          </div>
+          <div><dt>Porter 词干</dt>
+            <dd>手写实现：检索 transformer 与 transformers 等价，界面保留原词展示。</dd>
+          </div>
+          <div><dt>关键词自动提取</dt>
+            <dd>入库时按「标题词频×2 + 摘要词频」× IDF 取 Top 8，并入索引可检索。</dd>
+          </div>
+        </dl>
+        <details class="hint-box">
+          <summary>倒排索引结构示例</summary>
+          <pre class="fig">transform → [(12, tf=3, pos=[0,6,9]), (45, tf=1, …)]
+network   → [(12, tf=2, pos=[1,8]), (45, tf=5, …)]
+graph     → [(12, tf=1, pos=[5]), …]</pre>
+        </details>
+      </div>
+
+      <div class="card">
+        <h3>接口与扩展</h3>
+        <p class="hint">核心接口契约：</p>
         <table class="iface-table">
-          <thead><tr><th style="width:46%">接口</th><th>模块</th><th>说明</th></tr></thead>
+          <thead><tr><th>接口</th><th>模块</th><th>说明</th></tr></thead>
           <tbody>
-            <tr><td><code>Preprocessor.tokenize(text, with_positions, with_originals)</code></td><td class="scope">core</td><td>中英分词 → 词干序列（可选位置/原词）</td></tr>
-            <tr><td><code>Stemmer.stem(word) → str</code></td><td class="scope">core</td><td>Porter 词干（长度&lt;4 / 含符号不处理）</td></tr>
-            <tr><td><code>InvertedIndex.build(papers) / add_paper(paper)</code></td><td class="scope">core</td><td>构建 term → List&lt;Posting(pid, tf, positions)&gt;</td></tr>
-            <tr><td><code>InvertedIndex.search(query, mode) → {results, trace}</code></td><td class="scope">core</td><td>自动识别布尔 / AND 检索并返回剖析数据</td></tr>
-            <tr><td><code>Trie.suggest(prefix, top_k) → [{term, freq}]</code></td><td class="scope">core</td><td>前缀模糊提示，按词频降序</td></tr>
-            <tr><td><code>QueryParser.parse(q) → AST</code></td><td class="scope">core</td><td>递归下降：AND / OR / NOT / 括号 / 引号短语</td></tr>
-            <tr><td><code>KeywordExtractor.extract(title, abstract, …) → [str]</code></td><td class="scope">core</td><td>篇内 TF × 语料 IDF 关键词提取</td></tr>
-            <tr><td><code>document_parser.parse_file(path, use_ai) → {meta, confidence}</code></td><td class="scope">ingest</td><td>PDF/纯文本统一拆解入口</td></tr>
-            <tr><td><code>zip_importer.extract_entries(stream) → [ZipEntry]</code></td><td class="scope">ingest</td><td>安全解包（上限与穿越防护）</td></tr>
-            <tr><td><code>paper_agent.refine_metadata(text, meta) → (meta, ai_used)</code></td><td class="scope">agent</td><td>LLM 精修，失败回退规则结果</td></tr>
-            <tr><td><code>SearchService.search / add_manual / add_file / add_zip / …</code></td><td class="scope">service</td><td>Web 层唯一入口，RLock 保护</td></tr>
+            <tr><td data-label="接口"><code>Preprocessor.tokenize(text, …)</code></td><td data-label="模块">core</td><td data-label="说明">中英分词 → 词干序列（可选位置/原词）</td></tr>
+            <tr><td data-label="接口"><code>InvertedIndex.build / add_paper</code></td><td data-label="模块">core</td><td data-label="说明">构建 term → List&lt;Posting&gt;</td></tr>
+            <tr><td data-label="接口"><code>InvertedIndex.search(query, mode)</code></td><td data-label="模块">core</td><td data-label="说明">自动识别布尔/AND，返回结果与剖析 trace</td></tr>
+            <tr><td data-label="接口"><code>Trie.suggest(prefix, top_k)</code></td><td data-label="模块">core</td><td data-label="说明">前缀补全，按词频降序</td></tr>
+            <tr><td data-label="接口"><code>QueryParser.parse(q) → AST</code></td><td data-label="模块">core</td><td data-label="说明">递归下降布尔语法</td></tr>
+            <tr><td data-label="接口"><code>document_parser.parse_file(path, use_ai)</code></td><td data-label="模块">ingest</td><td data-label="说明">PDF/纯文本统一拆解入口</td></tr>
+            <tr><td data-label="接口"><code>paper_agent.refine_metadata(text, meta)</code></td><td data-label="模块">agent</td><td data-label="说明">LLM 精修，失败回退规则结果</td></tr>
+            <tr><td data-label="接口"><code>SearchService.search / add_* / …</code></td><td data-label="模块">service</td><td data-label="说明">Web 层唯一入口（RLock）</td></tr>
           </tbody>
         </table>
+        <p class="hint" style="margin-top:12px">扩展方式：</p>
+        <ul class="plain-list">
+          <li><b>新增数据源</b>：在 <code>crawler/registry.py</code> 注册一个「抓取函数 → 论文字典列表」的源即可。</li>
+          <li><b>更换 AI 服务商</b>：任意 OpenAI 兼容服务，在「AI 设置」填写地址 / Key / 模型即可（.env 亦兼容）。</li>
+          <li><b>补充互译词典</b>：编辑 <code>data/bilingual.json</code>（<code>{"pairs": [["英文","中文"], …]}</code>）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- 视图：AI 设置 ---------- -->
+    <section id="view-settings" class="page hidden">
+      <div class="page-head">
+        <h2>AI 设置</h2>
+        <p>配置大模型用于论文元数据精修（标题/摘要/作者/关键词）；未配置时自动使用本地规则拆解。</p>
       </div>
 
       <div class="card">
-        <h3>三、核心数据结构与算法</h3>
-        <p class="hint">以下为课程考察点的内存形态与复杂度。</p>
-
-        <h3 style="font-size:15px">倒排索引 · Inverted Index</h3>
-        <div class="fig-box"><span class="hl">term  →  List&lt;Posting(paper_id, tf, positions)&gt;</span>
-
-transform → [ (12, tf=3, pos=[0,6,9]), (45, tf=1, pos=[2]), … ]
-network  → [ (12, tf=2, pos=[1,8]),    (45, tf=5, pos=[0,3,4,7,11]), … ]
-graph    → [ (12, tf=1, pos=[5]), … ]
-  · 词条按词干合并变体（transformer / transformers → transform）
-  · df = 列表长度；tf = 篇内频次；positions 用于短语相邻匹配</div>
-
-        <h3 style="font-size:15px;margin-top:18px">AND 归并检索（最短优先，O(n)）</h3>
-        <div class="fig-box">查询：<span class="hl">graph AND neural AND network</span>
-  Posting 长度：graph=2, neural=4, network=5  →  按升序归并：<span class="hl">2 → 4 → 5</span>
-  双指针求交：先以最短列表(2)为基准，与 neural(4) 求交得候选，再与 network(5) 求交
-  每轮 O(len(a)+len(b))，总体线性；任一列表为空立即返回 ∅</div>
-
-        <h3 style="font-size:15px;margin-top:18px">Trie 前缀树（模糊提示 Top-K）</h3>
-        <div class="fig-box">root
- └─ t → r → a → n → s → f → o → r → m<span class="hl">*</span>   freq=108（transform）
-                    └─ …（transformers / transformer-based / transfer …）
-  每节点：children 字典 + freq 计数器；键入前缀后 DFS 收集完整词并按 freq 降序返回 Top 10</div>
-
-        <h3 style="font-size:15px;margin-top:18px">布尔查询文法（递归下降）</h3>
-        <div class="fig-box">or_expr  := and_expr (OR and_expr)*
-and_expr := not_expr (AND? not_expr)*      <span class="dim">// 相邻词 = 隐式 AND</span>
-not_expr := NOT not_expr | atom
-atom     := '(' or_expr ')' | 词条 | "短语"
-求值：AND → 交集 &，OR → 并集 |，NOT → 全集 − 差集</div>
-
-        <h3 style="font-size:15px;margin-top:18px">TF-IDF 相关性权重</h3>
-        <div class="formula">score(q, d) = Σ<sub>t∈q∩d</sub> tf(t,d) × idf(t)，　
-          <span class="frac"><span class="top">N + 1</span><span class="bottom">df(t) + 1</span></span> 的对数再加 1：
+        <div class="setting-status" id="setting-status">
+          <span class="dot"></span>
+          <span id="setting-status-text">正在读取配置…</span>
         </div>
-        <div class="fig-box" style="text-align:center;margin-top:8px">idf(t) = ln( (N+1) / (df(t)+1) ) + 1，　N = 总论文数，df = 词条文档频率</div>
+        <div class="field">
+          <label for="s-base">API 地址</label>
+          <input id="s-base" class="input mono" placeholder="https://api.deepseek.com/v1"
+                 autocomplete="off" spellcheck="false">
+          <p class="fhelp">OpenAI 兼容服务的 Base URL（不含末尾斜杠与 /chat/completions）。</p>
+        </div>
+        <div class="field">
+          <label for="s-key">API Key</label>
+          <div class="key-row">
+            <input id="s-key" class="input mono" type="password" placeholder="sk-…"
+                   autocomplete="off" spellcheck="false">
+            <button type="button" class="btn btn-sm" id="s-key-eye" title="显示 / 隐藏 Key">显示</button>
+          </div>
+          <p class="fhelp">仅保存在本机（安卓为应用私有目录），只发往上方填写的地址，不会回显明文。</p>
+        </div>
+        <div class="form-row">
+          <div class="field" style="flex:1.6">
+            <label for="s-model">模型名</label>
+            <input id="s-model" class="input mono" placeholder="deepseek-chat / gpt-4o-mini / qwen-plus …"
+                   autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field w-sm">
+            <label for="s-timeout">超时(秒)</label>
+            <input id="s-timeout" class="input mono" type="number" min="5" max="300" value="30">
+          </div>
+        </div>
+        <div class="pane-actions wrap">
+          <button id="btn-test" class="btn">测试连接</button>
+          <button id="btn-save" class="btn btn-p">保存配置</button>
+          <button id="btn-clear" class="btn btn-danger-text">清除</button>
+        </div>
+        <div id="setting-msg" class="report hidden"></div>
+      </div>
 
-        <h3 style="font-size:15px;margin-top:18px">Porter 词干提取（手写）</h3>
-        <div class="fig-box">transformers / transformer → <span class="hl">transform</span>
-studies → studi · convolutional → convolut · relational → relat
-检索 "transformer" 与 "transformers" 等价；界面保留原词展示（display 映射）</div>
-
-        <h3 style="font-size:15px;margin-top:18px">关键词自动提取（入库时）</h3>
-        <div class="fig-box">对每篇论文：score(term) = (标题 tf × 2 + 摘要 tf) × idf(term)
-取 Top 8 作为该论文 keywords，并入索引文本 → 关键词亦可被检索</div>
+      <div class="card">
+        <h3>AI 在哪些环节生效</h3>
+        <ul class="plain-list">
+          <li>在「文库 → 添加论文」上传 PDF / TXT / ZIP 时，勾选 <b>AI 精修元数据</b>，由模型补全/修正标题、摘要、作者、年份与关键词。</li>
+          <li>调用失败或未配置时自动回退规则拆解，不影响入库与检索。</li>
+          <li>配置保存后立即生效并持久化；重新安装应用前的旧数据不受影响。</li>
+        </ul>
       </div>
     </section>
+
   </main>
 </div>
 

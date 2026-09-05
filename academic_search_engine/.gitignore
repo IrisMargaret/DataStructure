@@ -1,4 +1,5 @@
-# Secrets (loaded via python-dotenv at startup)
+# ===== 主项目忽略 =====
+# 密钥
 .env
 
 # Python
@@ -6,12 +7,16 @@ __pycache__/
 *.py[cod]
 .venv/
 
-# Runtime artifacts
+# 运行产物
 uploads/
 logs/
 .pip-tmp/
 *.log
 .DS_Store
-
-# Stored paper files (runtime copies of uploaded originals)
+data/app_settings.json
 data/papers_files/
+
+# 桌面打包产物（位于主项目内）
+desktop/.build-venv/
+desktop/build/
+desktop/dist/

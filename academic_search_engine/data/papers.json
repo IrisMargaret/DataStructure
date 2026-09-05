@@ -324,7 +324,7 @@
       "supervision",
       "toward",
       "feedback",
-      "reasoning"
+      "scaling"
     ],
     "file_name": null,
     "file_store": null,
@@ -2596,7 +2596,7 @@
       "gaussian",
       "trackers",
       "observations",
-      "ambiguity"
+      "clean"
     ],
     "file_name": null,
     "file_store": null,
@@ -3023,8 +3023,8 @@
     "keywords": [
       "batching",
       "whisperx",
-      "interleaved",
       "context-aware",
+      "interleaved",
       "transcription",
       "audio",
       "whisper",
@@ -14143,8 +14143,8 @@
       "unified",
       "physical",
       "native",
-      "multimodal",
       "states",
+      "multimodal",
       "geometry"
     ],
     "file_name": null,
@@ -14788,8 +14788,8 @@
       "part-level",
       "industrial",
       "frontier",
-      "model",
-      "suite"
+      "suite",
+      "model"
     ],
     "file_name": null,
     "file_store": null,
@@ -15644,7 +15644,7 @@
       "rationales",
       "llms",
       "approach",
-      "given"
+      "language"
     ],
     "file_name": null,
     "file_store": null,
@@ -21372,8 +21372,8 @@
       "transfer",
       "text-to-text",
       "ntechnique",
-      "exploring",
       "nlp",
+      "exploring",
       "unified",
       "learning",
       "language"
@@ -30435,8 +30435,8 @@
       "llms",
       "privacy",
       "ugly",
-      "vulnerabilities",
       "bad",
+      "vulnerabilities",
       "attacks",
       "good"
     ],
@@ -32464,7 +32464,7 @@
   },
   {
     "id": 1125,
-    "source_id": null,
+    "source_id": "1125",
     "url": null,
     "title": "AEGIS: Exploring the Limit of World Knowledge Capabilities for Unified Mulitmodal Models",
     "abstract": "The capability of Unified Multimodal Models (UMMs) to apply world knowledge across diverse tasks remains a critical, unresolved challenge. Existing benchmarks fall short, offering only siloed, single-task evaluations with limited diagnostic power. To bridge this gap, we propose AEGIS (i.e.,AssessingEditing,Generation,Interpretation-Understanding forSuper-intelligence), a comprehensive multi-task benchmark covering visual understanding, generation, editing, and interleaved generation. AEGIS comprises 1,050 challenging, manually-annotated questions spanning 21 topics (including STEM, humanities, daily life, etc.) and 6 reasoning types. To concretely evaluate the performance of UMMs in world knowledge scope without ambiguous metrics, we further propose Deterministic Checklist-based Evaluation (DCE), a protocol that replaces ambiguous prompt-based scoring with atomic “Y/N” judgments, to enhance evaluation reliability. Our extensive experiments reveal that most UMMs exhibit severe world knowledge deficits and that performance degrades significantly with complex reasoning. Additionally, simple plug-in reasoning modules can partially mitigate these vulnerabilities, highlighting a promising direction for future research. These results highlight the importance of world-knowledge-based reasoning as a critical frontier for UMMs.",
@@ -32479,11 +32479,14 @@
     ],
     "year": null,
     "keywords": [
-      "world knowledge",
-      "unified multimodal models",
-      "multi-task benchmark",
+      "aegis",
+      "umms",
+      "world",
+      "knowledge",
+      "mulitmodal",
       "reasoning",
-      "checklist-based evaluation"
+      "unified",
+      "ambiguous"
     ],
     "file_name": "2601.00561v1.pdf",
     "file_store": "data/papers_files/1125_55b43d43.pdf",
